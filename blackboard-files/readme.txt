@@ -1,3 +1,5 @@
+### Notice: download the executables and data files corresponding to this directory from the releases page!
+
 Unwdmi Weergegevens Generator 1.0b
 ----------------------------------
 
