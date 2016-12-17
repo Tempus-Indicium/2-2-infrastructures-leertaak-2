@@ -13,3 +13,6 @@ hs_err_pid*
 
 # IntelliJ IDEA
 .idea/
+
+# Tempus Indicium ignores:
+blackboard-files.zip
