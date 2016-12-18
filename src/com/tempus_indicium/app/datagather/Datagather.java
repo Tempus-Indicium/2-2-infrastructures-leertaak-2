@@ -23,6 +23,7 @@ public class Datagather {
         while (true) {
             Socket clientSocket = this.acceptNewClient();
             if (clientSocket != null) {
+                // NOTE: we may have a problem when trying to assign multiple clients to a single thread
                 new DatagatherThread(clientSocket, this.clientLimiter).start();
             }
         }
