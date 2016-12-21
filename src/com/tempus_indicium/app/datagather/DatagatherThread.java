@@ -43,7 +43,7 @@ class DatagatherThread extends Thread {
         System.out.println(xmlStringIn.toString());
 //  @TODO: parse XML string (idea: multiple measurement objects, use Measurement class as Model for db table)
 //  @TODO: correct measurement data (based on last 30 measurements of station; write stored procedure)
-//  @TODO: save Measurement objects to DB
+//  @TODO: save Measurement objects to
 //  @TODO: Loop back to reading from the bufferedReader
 
         this.closeAndReleaseConnection();

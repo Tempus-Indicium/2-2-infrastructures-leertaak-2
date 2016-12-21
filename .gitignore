@@ -18,3 +18,4 @@ out/
 # Tempus Indicium ignores:
 blackboard-files.zip
 blackboard-files
+config.properties
