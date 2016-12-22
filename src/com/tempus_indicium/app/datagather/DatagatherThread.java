@@ -1,6 +1,6 @@
 package com.tempus_indicium.app.datagather;
 
-import com.tempus_indicium.app.Main;
+import com.tempus_indicium.app.App;
 
 import java.io.*;
 import java.net.Socket;
@@ -24,7 +24,7 @@ class DatagatherThread extends Thread {
 
     @Override
     public void run() {
-        Main.LOGGER.log(Level.INFO, "A new DatagatherThread has started!\nClient: "+this.clientSocket.toString()+"\n"
+        App.LOGGER.log(Level.INFO, "A new DatagatherThread has started!\nClient: "+this.clientSocket.toString()+"\n"
                 +"Client limit status: "+cliLock.toString()+"\n\n");
 
         this.openClientInputStream();
@@ -38,7 +38,7 @@ class DatagatherThread extends Thread {
                     break; // idea: call a new thread to do the parsing, correcting and storing of data
             }
         } catch (Exception e) {
-            Main.LOGGER.log(Level.WARNING, e.getMessage());
+            App.LOGGER.log(Level.WARNING, e.getMessage());
         }
         System.out.println(xmlStringIn.toString());
 //  @TODO: parse XML string (idea: multiple measurement objects, use Measurement class as Model for db table)
@@ -54,7 +54,7 @@ class DatagatherThread extends Thread {
             this.inputStream = this.clientSocket.getInputStream();
             this.bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
         } catch (Exception e) {
-            Main.LOGGER.log(Level.WARNING, e.getMessage()+"\n");
+            App.LOGGER.log(Level.WARNING, e.getMessage()+"\n");
         }
     }
 
@@ -62,7 +62,7 @@ class DatagatherThread extends Thread {
         try {
             this.clientSocket.close();
         } catch (Exception e) {
-            Main.LOGGER.log(Level.WARNING, e.getMessage());
+            App.LOGGER.log(Level.WARNING, e.getMessage());
         }
         this.cliLock.release();
     }

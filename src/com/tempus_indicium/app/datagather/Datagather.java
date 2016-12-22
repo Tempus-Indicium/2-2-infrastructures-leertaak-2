@@ -1,6 +1,6 @@
 package com.tempus_indicium.app.datagather;
 
-import com.tempus_indicium.app.Main;
+import com.tempus_indicium.app.App;
 
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -16,8 +16,8 @@ public class Datagather {
     private Semaphore clientLimiter;
 
     public Datagather() {
-        this.clientLimiter = new Semaphore(Main.CLI_LIMIT);
-        this.setupServerSocket(Main.SERVER_PORT);
+        this.clientLimiter = new Semaphore(App.CLI_LIMIT);
+        this.setupServerSocket(App.SERVER_PORT);
 
         //noinspection InfiniteLoopStatement
         while (true) {
@@ -35,7 +35,7 @@ public class Datagather {
             this.clientLimiter.acquire();
             socket = this.serverSocket.accept();
         } catch (Exception e) {
-            Main.LOGGER.log(Level.WARNING, e.getMessage());
+            App.LOGGER.log(Level.WARNING, e.getMessage());
         }
         return socket;
     }
@@ -43,9 +43,9 @@ public class Datagather {
     private void setupServerSocket(int port) {
         try {
             this.serverSocket = new ServerSocket(port);
-            Main.LOGGER.log(Level.INFO, "ServerSocket started, listening on port: "+port+"\n\n");
+            App.LOGGER.log(Level.INFO, "ServerSocket started, listening on port: "+port+"\n\n");
         } catch (Exception e) {
-            Main.LOGGER.log(Level.SEVERE, e.getMessage());
+            App.LOGGER.log(Level.SEVERE, e.getMessage());
         }
     }
 

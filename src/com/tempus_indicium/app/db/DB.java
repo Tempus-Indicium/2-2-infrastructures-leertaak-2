@@ -1,6 +1,6 @@
 package com.tempus_indicium.app.db;
 
-import com.tempus_indicium.app.Main;
+import com.tempus_indicium.app.App;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -15,6 +15,7 @@ import java.util.logging.Level;
 public class DB {
     private String dbms, username, password, server, database;
     private int port;
+
 
     public DB(String dbms, String username, String password, String server, int port, String database) {
         this.dbms = dbms;
@@ -38,7 +39,7 @@ public class DB {
                             ":" + Integer.toString(port) + "/" + this.database,
                     connectionProps);
         }
-        Main.LOGGER.log(Level.INFO, "Connected to MySQL database.");
+        App.LOGGER.log(Level.INFO, "Connected to MySQL database.");
         return conn;
     }
 

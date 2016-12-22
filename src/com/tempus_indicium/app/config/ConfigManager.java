@@ -1,6 +1,6 @@
 package com.tempus_indicium.app.config;
 
-import com.tempus_indicium.app.Main;
+import com.tempus_indicium.app.App;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +23,7 @@ public class ConfigManager {
 
             prop.load(inputStream);
         } catch (IOException e) {
-            Main.LOGGER.log(Level.SEVERE, "Cannot read properties file: \n"+e.getMessage());
+            App.LOGGER.log(Level.SEVERE, "Cannot read properties file: \n"+e.getMessage());
         }
         return prop;
     }
