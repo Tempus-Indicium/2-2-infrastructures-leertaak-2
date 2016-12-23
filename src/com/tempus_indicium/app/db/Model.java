@@ -5,4 +5,9 @@ package com.tempus_indicium.app.db;
  * Part of the 2-2-infrastructures-leertaak-2 project.
  */
 public class Model {
+
+    // @TODO: function to build insert query for a specific Model
+    // Idea: may make this into an interface or abstract class?
+    // @TODO: build generic select statements
+
 }

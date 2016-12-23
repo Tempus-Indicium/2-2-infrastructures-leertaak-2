@@ -16,6 +16,14 @@ public class DB {
     private String dbms, username, password, server, database;
     private int port;
 
+    /**
+     * use the App.config / config.properties file database settings
+     */
+    public DB() {
+        this(App.config.getProperty("DB_SYSTEM"), App.config.getProperty("DB_USER"),
+            App.config.getProperty("DB_PASSWORD"), App.config.getProperty("DB_SERVER"),
+            Integer.parseInt(App.config.getProperty("DB_PORT")), App.config.getProperty("DB_DATABASE"));
+    }
 
     public DB(String dbms, String username, String password, String server, int port, String database) {
         this.dbms = dbms;
