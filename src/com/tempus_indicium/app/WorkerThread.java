@@ -59,6 +59,7 @@ public class WorkerThread extends Thread {
                 measurementsData) {
             System.out.println(m.toString());
         }
+        // @TODO: save measurements into the database (Model.saveBatch(List))
     }
 
     private void openClientInputStream() {
