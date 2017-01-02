@@ -1,40 +1,57 @@
 package com.tempus_indicium.app.parsing;
 
-import com.tempus_indicium.app.db.Measurement;
-import jdk.internal.org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.SAXException;
+import com.tempus_indicium.app.App;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import java.util.LinkedList;
-import java.util.List;
+import java.sql.Time;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.logging.Level;
 
 /**
  * Created by peterzen on 2016-12-23.
  * Part of the 2-2-infrastructures-leertaak-2 project.
+ *
+ * MeasurementParser:
+ * Parses the measurement data to be in a correct form for Measurement models
  */
-public class MeasurementParser extends DefaultHandler {
-    List<Measurement> measurements;
-    String xmlStringIn;
+public class MeasurementParser {
 
-    public MeasurementParser(String xmlStringIn) {
-        this.xmlStringIn = xmlStringIn;
-        measurements = new LinkedList<>(); // @TODO: check out differences between collection types again..
-        this.parseXmlString();
-    }
-
-    private void parseXmlString() {
-        SAXParserFactory factory = SAXParserFactory.newInstance();
+    public Integer stn(String stnId) {
         try {
-            SAXParser parser = factory.newSAXParser();
-            // @TODO rewrite application to directly supply the inputStream to the xml parser
-            System.out.println("parsing of xml is unfinished");
-//            parser.parse(this.xmlInputStream, this);
-        } catch (ParserConfigurationException | SAXException e) {
-            e.printStackTrace();
+            return Integer.parseUnsignedInt(stnId);
+        } catch (Exception e) {
+            App.LOGGER.log(Level.INFO, e.getMessage());
         }
+        return null;
     }
 
+    public java.sql.Date acquisitionDate(String date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            return new java.sql.Date(dateFormat.parse(date).getTime());
+        } catch (ParseException e) {
+            App.LOGGER.log(Level.INFO, e.getMessage());
+        }
+        return null;
+    }
+
+    public Time acquisitionTime(String time) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+        try {
+            return new java.sql.Time(dateFormat.parse(time).getTime());
+        } catch (ParseException e) {
+            App.LOGGER.log(Level.INFO, e.getMessage());
+        }
+        return null;
+    }
+
+    public Double temperature(String temperature) {
+        try {
+            return Double.parseDouble(temperature);
+        } catch (Exception e) {
+            App.LOGGER.log(Level.INFO, e.getMessage());
+        }
+        return null;
+    }
 
 }

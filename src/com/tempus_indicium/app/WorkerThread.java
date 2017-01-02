@@ -1,11 +1,16 @@
 package com.tempus_indicium.app;
 
+import com.tempus_indicium.app.db.Measurement;
+import com.tempus_indicium.app.parsing.MeasurementExtractor;
+import com.tempus_indicium.app.parsing.MeasurementParser;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.sql.Connection;
+import java.util.List;
 import java.util.logging.Level;
 
 /**
@@ -28,7 +33,6 @@ public class WorkerThread extends Thread {
     private Connection dbConnection;
     private Socket clientSocket;
     private InputStream inputStream;
-    private BufferedReader bufferedReader;
 
     public WorkerThread(Connection dbConnection, Socket clientSocket) {
         this.dbConnection = dbConnection;
@@ -39,35 +43,27 @@ public class WorkerThread extends Thread {
     public void run() {
         // step 1
         this.openClientInputStream();
-
-        String line;
-        String xmlStringIn = "";
-        try {
-            // step 2: read through stream|also start of loop till streaming stops
-            while ((line = bufferedReader.readLine()) != null) {
-                // step 3: building the xml string
-                xmlStringIn += line;
-                if (line.equals("</WEATHERDATA>")) {
-                    this.processXmlString(xmlStringIn);
-                    xmlStringIn = ""; // reset string, gather new Measurements
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        while (!clientSocket.isInputShutdown()) {
+            this.processInputStream();
         }
 
         this.closeAndReleaseConnection();
     }
 
-    private void processXmlString(String xmlStringIn) {
+    private void processInputStream() {
         // step 4: parse into Measurement objects
-
+        MeasurementParser dataParser = new MeasurementParser();
+        MeasurementExtractor extractor = new MeasurementExtractor(this.inputStream, dataParser);
+        List<Measurement> measurementsData = extractor.extractDataFromXML();
+        for (Measurement m :
+                measurementsData) {
+            System.out.println(m.toString());
+        }
     }
 
     private void openClientInputStream() {
         try {
             this.inputStream = this.clientSocket.getInputStream();
-            this.bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
         } catch (Exception e) {
             App.LOGGER.log(Level.WARNING, e.getMessage()+"\n");
         }

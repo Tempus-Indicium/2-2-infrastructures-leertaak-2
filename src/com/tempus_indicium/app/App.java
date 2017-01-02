@@ -1,12 +1,7 @@
 package com.tempus_indicium.app;
 
 import com.tempus_indicium.app.config.ConfigManager;
-import com.tempus_indicium.app.db.DB;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -19,7 +14,6 @@ public class App {
     public final static Properties config = ConfigManager.getProperties("config.properties");
 
     public final static int SERVER_PORT = Integer.parseInt(config.getProperty("SERVER_PORT"));
-    public final static int CLI_LIMIT = Integer.parseInt(config.getProperty("CLI_LIMIT"));
 
     /**
      * Start of the Tempus Indicium app

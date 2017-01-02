@@ -20,6 +20,7 @@ public class MasterThread extends Thread {
 // 2. open database connections for the WorkerThreads to use (maintain a connection pool)
 // 3. spawn a WorkerThread for each new client
 // 4. including the assignment of DB connections to WorkerThreads
+
     // Note: Around 16 WorkerThreads per connection would mean 50 connections for 800 WorkerThreads
 
     // http://stackoverflow.com/questions/322715/when-to-use-linkedlist-over-arraylist
