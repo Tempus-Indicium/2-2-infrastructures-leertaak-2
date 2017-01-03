@@ -8,6 +8,8 @@ import java.sql.Time;
  * Part of the 2-2-infrastructures-leertaak-2 project.
  */
 public class Measurement extends Model {
+    protected static final String db_table = "measurements";
+
     private Integer stn;
     private Date acquisition_date;
     private Time acquisition_time;
@@ -39,6 +41,21 @@ public class Measurement extends Model {
                 ", acquisition_date=" + acquisition_date +
                 ", acquisition_time=" + acquisition_time +
                 ", temperature=" + temperature +
+                ", dew=" + dew +
+                ", station_pressure=" + station_pressure +
+                ", sea_pressure=" + sea_pressure +
+                ", visibility=" + visibility +
+                ", wind_speed=" + wind_speed +
+                ", rainfall=" + rainfall +
+                ", snowfall=" + snowfall +
+                ", did_freeze=" + did_freeze +
+                ", did_rain=" + did_rain +
+                ", did_snow=" + did_snow +
+                ", did_hail=" + did_hail +
+                ", did_storm=" + did_storm +
+                ", did_tornado=" + did_tornado +
+                ", cloudiness=" + cloudiness +
+                ", wind_direction=" + wind_direction +
                 '}';
     }
 
@@ -62,11 +79,11 @@ public class Measurement extends Model {
         this.dew = dew;
     }
 
-    public void setStation_pressure(Double station_pressure) {
+    public void setStationPressure(Double station_pressure) {
         this.station_pressure = station_pressure;
     }
 
-    public void setSea_pressure(Double sea_pressure) {
+    public void setSeaPressure(Double sea_pressure) {
         this.sea_pressure = sea_pressure;
     }
 
@@ -74,7 +91,7 @@ public class Measurement extends Model {
         this.visibility = visibility;
     }
 
-    public void setWind_speed(Double wind_speed) {
+    public void setWindSpeed(Double wind_speed) {
         this.wind_speed = wind_speed;
     }
 
@@ -114,7 +131,7 @@ public class Measurement extends Model {
         this.cloudiness = cloudiness;
     }
 
-    public void setWind_direction(Integer wind_direction) {
+    public void setWindDirection(Integer wind_direction) {
         this.wind_direction = wind_direction;
     }
 }

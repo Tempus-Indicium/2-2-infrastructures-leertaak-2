@@ -1,6 +1,7 @@
 package com.tempus_indicium.app;
 
 import com.tempus_indicium.app.db.Measurement;
+import com.tempus_indicium.app.parsing.EndOfMeasurementsException;
 import com.tempus_indicium.app.parsing.MeasurementExtractor;
 import com.tempus_indicium.app.parsing.MeasurementParser;
 
@@ -9,7 +10,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.net.SocketException;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -43,23 +46,37 @@ public class WorkerThread extends Thread {
     public void run() {
         // step 1
         this.openClientInputStream();
-        while (!clientSocket.isInputShutdown()) {
+
+        while (!clientSocket.isClosed()) {
             this.processInputStream();
         }
 
-        this.closeAndReleaseConnection();
+//        this.closeAndReleaseConnection();
     }
 
     private void processInputStream() {
         // step 4: parse into Measurement objects
         MeasurementParser dataParser = new MeasurementParser();
         MeasurementExtractor extractor = new MeasurementExtractor(this.inputStream, dataParser);
+
         List<Measurement> measurementsData = extractor.extractDataFromXML();
+        if (measurementsData == null) {
+            this.closeAndReleaseConnection();
+            return;
+        }
         for (Measurement m :
                 measurementsData) {
             System.out.println(m.toString());
         }
+        // step 5
+        // @TODO: make corrections on the measurement data
+
         // @TODO: save measurements into the database (Model.saveBatch(List))
+        try {
+            Measurement.saveBatch(measurementsData, this.dbConnection);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void openClientInputStream() {

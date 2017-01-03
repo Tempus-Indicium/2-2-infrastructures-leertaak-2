@@ -25,6 +25,15 @@ public class MeasurementParser {
         return null;
     }
 
+    public Integer windDirection(String windDirection) {
+        try {
+            return Integer.parseUnsignedInt(windDirection);
+        } catch (Exception e) {
+            App.LOGGER.log(Level.INFO, e.getMessage());
+        }
+        return null;
+    }
+
     public java.sql.Date acquisitionDate(String date) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         try {
@@ -45,9 +54,15 @@ public class MeasurementParser {
         return null;
     }
 
-    public Double temperature(String temperature) {
+    /**
+     * Notice: if special behaviour is needed, do not edit this method
+     * Instead you may create an alternative method based on this one
+     * @param String standardDouble string to be parsed into a Double
+     * @return nullable Double object
+     */
+    public Double standardDouble(String standardDouble) {
         try {
-            return Double.parseDouble(temperature);
+            return Double.parseDouble(standardDouble);
         } catch (Exception e) {
             App.LOGGER.log(Level.INFO, e.getMessage());
         }
