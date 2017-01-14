@@ -46,7 +46,7 @@ public class MasterThread extends Thread {
                 this.spinUpConnectionsAsNeeded(workersCounter, workersPerConnection);
 
                 // step 3: spawn new WorkerThread with the last dbConnection available
-                new WorkerThread(this.dbConnections.get(this.dbConnections.size()-1), clientSocket).run();
+                new WorkerThread(this.dbConnections.get(this.dbConnections.size()-1), clientSocket).start();
                 workersCounter++;
                 App.LOGGER.log(Level.INFO, "Current workers: "+workersCounter);
             }

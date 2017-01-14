@@ -20,7 +20,7 @@ public class App {
      * @param args any arguments
      */
     public static void main(String[] args) {
-        new MasterThread().run();
+        new MasterThread().start();
 
 //        @TODO: here we could define worker threads using Datagather
 //        Datagather dataGatherer = new Datagather(); // is blocking

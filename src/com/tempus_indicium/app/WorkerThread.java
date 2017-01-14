@@ -46,7 +46,7 @@ public class WorkerThread extends Thread {
             this.processInputStream();
         }
 
-//        this.closeAndReleaseConnection();
+        this.closeAndReleaseConnection();
     }
 
     private void processInputStream() {
@@ -60,13 +60,12 @@ public class WorkerThread extends Thread {
             return;
         }
 
-        for (Measurement m : measurementsData)
-            System.out.println(m.toString());
+//        for (Measurement m : measurementsData)
+//            System.out.println(m.toString());
 
         // step 5
         // @TODO: make corrections on the measurement data
 
-        // @TODO: save measurements into the database (Model.saveBatch(List))
         try {
             Measurement.saveBatch(measurementsData, this.dbConnection);
         } catch (SQLException e) {
