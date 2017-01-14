@@ -48,7 +48,7 @@ public class MasterThread extends Thread {
                 // step 3: spawn new WorkerThread with the last dbConnection available
                 new WorkerThread(this.dbConnections.get(this.dbConnections.size()-1), clientSocket).run();
                 workersCounter++;
-                System.out.println("Current workers: "+workersCounter);
+                App.LOGGER.log(Level.INFO, "Current workers: "+workersCounter);
             }
         }
     }

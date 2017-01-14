@@ -20,7 +20,7 @@ public class MeasurementParser {
         try {
             return Integer.parseUnsignedInt(stnId);
         } catch (Exception e) {
-            App.LOGGER.log(Level.INFO, e.getMessage());
+//            App.LOGGER.log(Level.WARNING, e.getMessage());
         }
         return null;
     }
@@ -29,7 +29,7 @@ public class MeasurementParser {
         try {
             return Integer.parseUnsignedInt(windDirection);
         } catch (Exception e) {
-            App.LOGGER.log(Level.INFO, e.getMessage());
+//            App.LOGGER.log(Level.WARNING, e.getMessage());
         }
         return null;
     }
@@ -39,7 +39,7 @@ public class MeasurementParser {
         try {
             return new java.sql.Date(dateFormat.parse(date).getTime());
         } catch (ParseException e) {
-            App.LOGGER.log(Level.INFO, e.getMessage());
+//            App.LOGGER.log(Level.WARNING, e.getMessage());
         }
         return null;
     }
@@ -49,7 +49,7 @@ public class MeasurementParser {
         try {
             return new java.sql.Time(dateFormat.parse(time).getTime());
         } catch (ParseException e) {
-            App.LOGGER.log(Level.INFO, e.getMessage());
+//            App.LOGGER.log(Level.WARNING, e.getMessage());
         }
         return null;
     }
@@ -64,7 +64,7 @@ public class MeasurementParser {
         try {
             return Double.parseDouble(standardDouble);
         } catch (Exception e) {
-            App.LOGGER.log(Level.INFO, e.getMessage());
+//            App.LOGGER.log(Level.WARNING, e.getMessage());
         }
         return null;
     }

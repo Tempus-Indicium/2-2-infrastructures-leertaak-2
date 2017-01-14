@@ -1,16 +1,11 @@
 package com.tempus_indicium.app;
 
 import com.tempus_indicium.app.db.Measurement;
-import com.tempus_indicium.app.parsing.EndOfMeasurementsException;
 import com.tempus_indicium.app.parsing.MeasurementExtractor;
 import com.tempus_indicium.app.parsing.MeasurementParser;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.Socket;
-import java.net.SocketException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -64,10 +59,10 @@ public class WorkerThread extends Thread {
             this.closeAndReleaseConnection();
             return;
         }
-        for (Measurement m :
-                measurementsData) {
+
+        for (Measurement m : measurementsData)
             System.out.println(m.toString());
-        }
+
         // step 5
         // @TODO: make corrections on the measurement data
 
