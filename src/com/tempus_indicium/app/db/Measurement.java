@@ -1,6 +1,8 @@
 package com.tempus_indicium.app.db;
 
+import java.lang.reflect.Field;
 import java.sql.*;
+import java.util.LinkedList;
 import java.util.List;
 
 import static java.sql.Statement.EXECUTE_FAILED;
@@ -11,6 +13,7 @@ import static java.sql.Statement.EXECUTE_FAILED;
  */
 public class Measurement extends Model {
     private static final String db_table = "measurements";
+    private List<String> missingVariables;
 
     private Integer stn;
     private Date acquisition_date;
@@ -33,7 +36,73 @@ public class Measurement extends Model {
     private Integer wind_direction;
 
     public Measurement() {
+        this.missingVariables = new LinkedList<>();
+    }
 
+    public List<String> getMissingVariables() {
+        return this.missingVariables;
+    }
+
+    public Field getVariable(String var) throws NoSuchFieldException {
+        return this.getClass().getDeclaredField(var);
+    }
+
+    public boolean hasMissingData() {
+        if (this.acquisition_date == null) {
+            this.missingVariables.add("acquisition_date");
+        }
+        if (this.acquisition_time == null) {
+            this.missingVariables.add("acquisition_time");
+        }
+        if (this.temperature == null) {
+            this.missingVariables.add("temperature");
+        }
+        if (this.dew == null) {
+            this.missingVariables.add("dew");
+        }
+        if (this.station_pressure == null) {
+            this.missingVariables.add("station_pressure");
+        }
+        if (this.sea_pressure == null) {
+            this.missingVariables.add("sea_pressure");
+        }
+        if (this.visibility == null) {
+            this.missingVariables.add("visibility");
+        }
+        if (this.wind_speed == null) {
+            this.missingVariables.add("wind_speed");
+        }
+        if (this.rainfall == null) {
+            this.missingVariables.add("rainfall");
+        }
+        if (this.snowfall == null) {
+            this.missingVariables.add("snowfall");
+        }
+        if (this.did_freeze == null) {
+            this.missingVariables.add("did_freeze");
+        }
+        if (this.did_rain == null) {
+            this.missingVariables.add("did_rain");
+        }
+        if (this.did_snow == null) {
+            this.missingVariables.add("did_snow");
+        }
+        if (this.did_hail == null) {
+            this.missingVariables.add("did_hail");
+        }
+        if (this.did_storm == null) {
+            this.missingVariables.add("did_storm");
+        }
+        if (this.did_tornado == null) {
+            this.missingVariables.add("did_tornado");
+        }
+        if (this.cloudiness == null) {
+            this.missingVariables.add("cloudiness");
+        }
+        if (this.wind_direction == null) {
+            this.missingVariables.add("wind_direction");
+        }
+        return !this.missingVariables.isEmpty();
     }
 
     @Override

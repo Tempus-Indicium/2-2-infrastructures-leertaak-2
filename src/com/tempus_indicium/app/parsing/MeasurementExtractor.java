@@ -61,7 +61,6 @@ public class MeasurementExtractor extends DefaultHandler {
         // use qName to identify the tag
         if (qName.equalsIgnoreCase("MEASUREMENT")) {
             this.newMeasurement = new Measurement();
-            App.LOGGER.log(Level.FINE, "Starting new Measurement object");
         }
     }
 
@@ -76,7 +75,7 @@ public class MeasurementExtractor extends DefaultHandler {
                 this.measurementsData.add(newMeasurement);
                 break;
             case "WEATHERDATA":
-                // do something to stop sax from parsing
+                // literally throw an exception to stop sax from parsing
                 throw new EndOfMeasurementsException();
             case "STN":
                 this.newMeasurement.setStn(this.measurementParser.stn(this.currentTagValue));

@@ -51,8 +51,7 @@ public class WorkerThread extends Thread {
 
     private void processInputStream() {
         // step 4: parse into Measurement objects
-        MeasurementParser dataParser = new MeasurementParser();
-        MeasurementExtractor extractor = new MeasurementExtractor(this.inputStream, dataParser);
+        MeasurementExtractor extractor = new MeasurementExtractor(this.inputStream, new MeasurementParser());
 
         List<Measurement> measurementsData = extractor.extractDataFromXML();
         if (measurementsData == null) {
@@ -60,12 +59,11 @@ public class WorkerThread extends Thread {
             return;
         }
 
-//        for (Measurement m : measurementsData)
-//            System.out.println(m.toString());
+        // step 5: make corrections
+//  @TODO: have to determine how to actually do this, might need to change up the application quite a bit
+//        measurementsData.forEach(MeasurementCorrection::correctMeasurement);
 
-        // step 5
-        // @TODO: make corrections on the measurement data
-
+        // step 6 & 7: prep and exec insert queries
         try {
             Measurement.saveBatch(measurementsData, this.dbConnection);
         } catch (SQLException e) {

@@ -1,11 +1,8 @@
 package com.tempus_indicium.app.parsing;
 
-import com.tempus_indicium.app.App;
-
 import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.logging.Level;
 
 /**
  * Created by peterzen on 2016-12-23.
