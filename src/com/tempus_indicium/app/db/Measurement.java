@@ -29,7 +29,7 @@ public class Measurement extends Model {
     private byte[] stn;
     private byte[] stnName;
     private byte[] stnCountry;
-    private byte[] acquisition_datetime;
+    private byte[] acquisition_time;
     private byte[] temperature;
     private byte[] dew;
     private byte[] station_pressure;
@@ -61,8 +61,8 @@ public class Measurement extends Model {
     }
 
     public boolean hasMissingData() {
-        if (this.acquisition_datetime == null) {
-            this.missingVariables.add("acquisition_date");
+        if (this.acquisition_time == null) {
+            this.missingVariables.add("acquisition_time");
         }
         if (this.temperature == null) {
             this.missingVariables.add("temperature");
@@ -117,23 +117,12 @@ public class Measurement extends Model {
 
     public void setVariableFromXMLString(String xmlString) {
         if (xmlString.contains("<DATE>")) {
-            String strDate;
-            if ((strDate = this.findMatchInXMLString(App.xmlPatterns.get("date"), xmlString)) != null) {
-                if (this.timeString != null) {
-                    this.setAcquisitionDateTime(strDate, this.timeString);
-                } else {
-                    this.dateString = strDate;
-                }
-            }
+            return; // skip the date since we can already read this from the filename
         }
         if (xmlString.contains("<TIME>")) {
             String time;
             if ((time = this.findMatchInXMLString(App.xmlPatterns.get("time"), xmlString)) != null) {
-                if (this.dateString != null) {
-                    this.setAcquisitionDateTime(this.dateString, time);
-                } else {
-                    this.timeString = time;
-                }
+                this.setAcquisitionTime(time);
             }
         }
         if (xmlString.contains("<TEMP>")) {
@@ -230,9 +219,9 @@ public class Measurement extends Model {
             String[] stnDetails;
             if ((stnDetails = FileStore.stations.get(Integer.parseInt(stn))) != null) {
                 // station details found
-                this.setStn(stnDetails[0]);
-                this.setStnName(stnDetails[1]);
-                this.setStnCountry(stnDetails[2]);
+                this.setStn(stnDetails[0]); // set the station id using the regenerated `id` column
+                this.setStnName(stnDetails[2]);
+                this.setStnCountry(stnDetails[3]);
                 return true;
             }
         }
@@ -250,20 +239,23 @@ public class Measurement extends Model {
     private void setStn(String stn) {
         int intStn = Integer.parseInt(stn);
         this.stn = new byte[]{
-                (byte) ((intStn >> 16) & 0xFF),
                 (byte) ((intStn >> 8) & 0xFF),
                 (byte) (intStn & 0xFF)
         };
-//        System.out.println(this.stn[0] + ":" + this.stn[1] + ":" + this.stn[2]); // debug bytes
+//        System.out.println(this.stn[0] + ":" + this.stn[1]); // debug bytes
     }
 
-    private void setAcquisitionDateTime(String acquisitionDate, String acquisitionTime) {
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private void setAcquisitionTime(String acquisitionTime) {
+        DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
         try {
-            Date date = format.parse(acquisitionDate + " " + acquisitionTime);
-            this.acquisition_datetime = ByteBuffer.allocate(4).putInt(((int) date.getTime())).array();
+            Date timeOnly = timeFormat.parse(acquisitionTime);
+            int intTime = (int) (timeOnly.getTime() / 1000);
+            this.acquisition_time = new byte[]{
+                    (byte) ((intTime >> 8) & 0xFF),
+                    (byte) (intTime & 0xFF)
+            };
         } catch (ParseException e) {
-            this.acquisition_datetime = ByteBuffer.allocate(4).putInt(0).array();
+            e.printStackTrace();
         }
 
     }
@@ -388,7 +380,14 @@ public class Measurement extends Model {
 
     private byte[] getArrayOfByteVariables() {
         // This function will form the structure of a Measurement row
-        byte[] arr = new byte[13];
+//        System.out.println(this.stn.length +
+//                this.acquisition_time.length +
+//                this.temperature.length +
+//                this.dew.length +
+//                this.visibility.length);
+        byte[] arr = new byte[
+                    10
+                ];
         ByteBuffer wrapper = ByteBuffer.wrap(arr);
         // 3 bytes for the station identifier
         wrapper.put(valOrNull(this.stn));
@@ -399,7 +398,7 @@ public class Measurement extends Model {
 //        wrapper.put(new byte[]{ (byte) (this.stnCountry.length & 0xFF) });
 //        wrapper.put(valOrNull(this.stnName));
         // 4 bytes containing the acquisition date and time in unix timestamp format
-        wrapper.put(valOrNull(this.acquisition_datetime));
+        wrapper.put(valOrNull(this.acquisition_time));
         // 2 bytes containing the temperature in a value*10 matter to avoid decimals
         wrapper.put(valOrNull(this.temperature));
         // 2 bytes containing the dew point in a value*10 matter to avoid decimals

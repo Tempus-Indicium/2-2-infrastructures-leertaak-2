@@ -84,10 +84,10 @@ public class FileStore {
             while ((line = bufferedReader.readLine()) != null) {
 
                 String[] row = line.split(csvSplitBy);
-                if (row[0].equals("stn"))
+                if (row[0].equals("id"))
                     continue;
 
-                stations.put(Integer.parseInt(row[0]), row);
+                stations.put(Integer.parseInt(row[1]), row);
             }
         } catch (IOException e) {
             e.printStackTrace();
