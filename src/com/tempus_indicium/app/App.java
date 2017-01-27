@@ -1,9 +1,15 @@
 package com.tempus_indicium.app;
 
 import com.tempus_indicium.app.config.ConfigManager;
+import com.tempus_indicium.app.db.FileStore;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 /**
  * Created by peterzen on 2016-12-17.
@@ -15,32 +21,41 @@ public class App {
 
     public final static int SERVER_PORT = Integer.parseInt(config.getProperty("SERVER_PORT"));
 
+    public static HashMap<String, Pattern> xmlPatterns;
+    public static List<byte[]> measurementRows;
+
     /**
      * Start of the Tempus Indicium app
      * @param args any arguments
      */
     public static void main(String[] args) {
-        new MasterThread().start();
+        if(!FileStore.initializeFileStore()) {
+            LOGGER.log(Level.SEVERE, "File store could not be initialized.");
+            System.exit(1);
+        }
 
-//        @TODO: here we could define worker threads using Datagather
-//        Datagather dataGatherer = new Datagather(); // is blocking
-        // idea for DB connections: limit amount of statements / connection (load N statements: start statement
-        // execution thread in one of the DB connections (also limit connections?))
-        // or rather probably use JDBC ConnectionPool thingy (caches db connections)
-//        DB db = new DB(config.getProperty("DB_SYSTEM"), config.getProperty("DB_USER"),
-//            config.getProperty("DB_PASSWORD"), config.getProperty("DB_SERVER"),
-//            Integer.parseInt(config.getProperty("DB_PORT")), config.getProperty("DB_DATABASE"));
-//        try {
-//            Connection dbConnection = db.getConnection();
-//            Statement dbStatement = dbConnection.createStatement();
-//            ResultSet results = dbStatement.executeQuery("SELECT * FROM `stations` LIMIT 1, 10");
-//            while (results.next()) {
-//                System.out.println(results.getInt("stn"));
-//            }
-//            dbConnection.close();
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
+        FileStore.loadStationsFile();
+
+        // prepare regex patterns
+        xmlPatterns = new HashMap<>();
+        xmlPatterns.put("stn", Pattern.compile("([0-9]+)"));
+        xmlPatterns.put("date", Pattern.compile("([0-9-]+)"));
+        xmlPatterns.put("time", Pattern.compile("([0-9:]+)"));
+        xmlPatterns.put("temp", Pattern.compile("([0-9.-]+)"));
+        xmlPatterns.put("dewp", Pattern.compile("([0-9.-]+)"));
+        xmlPatterns.put("stp", Pattern.compile("([0-9.]+)"));
+        xmlPatterns.put("slp", Pattern.compile("([0-9.]+)"));
+        xmlPatterns.put("visib", Pattern.compile("([0-9.]+)"));
+        xmlPatterns.put("wdsp", Pattern.compile("([0-9.]+)"));
+        xmlPatterns.put("prcp", Pattern.compile("([0-9.]+)"));
+        xmlPatterns.put("sndp", Pattern.compile("([0-9-.]+)"));
+        xmlPatterns.put("frshtt", Pattern.compile("([0-1]+)"));
+        xmlPatterns.put("cldc", Pattern.compile("([0-9.]+)"));
+        xmlPatterns.put("wnddir", Pattern.compile("([0-9]+)"));
+
+        App.measurementRows = new ArrayList<>();
+
+        new MasterThread().start();
     }
 
 }

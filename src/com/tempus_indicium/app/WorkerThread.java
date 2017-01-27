@@ -1,13 +1,18 @@
 package com.tempus_indicium.app;
 
+import com.tempus_indicium.app.db.FileStore;
 import com.tempus_indicium.app.db.Measurement;
 import com.tempus_indicium.app.parsing.MeasurementExtractor;
 import com.tempus_indicium.app.parsing.MeasurementParser;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.Socket;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -42,40 +47,50 @@ public class WorkerThread extends Thread {
         // step 1
         this.openClientInputStream();
 
-        while (!clientSocket.isClosed()) {
-            this.processInputStream();
+        try {
+            HashSet measurements = new HashSet();
+            String line;
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            boolean skipMeasurement;
+            while ((line = bufferedReader.readLine()) != null) {
+                if (line.contains("<MEASUREMENT>")) {
+                    // start new measurement
+                    Measurement m = new Measurement();
+                    skipMeasurement = false;
+                    while (!(line = bufferedReader.readLine()).contains("</MEASUREMENT>")) {
+                        if (skipMeasurement)
+                            continue; // skip lines for this measurement
+
+                        if (line.contains("<STN>")) { // stn is an exception
+                            if (!m.setStnFromXmlString(line)) {
+                                skipMeasurement = true;
+                                continue;
+                            }
+                        }
+
+                        m.setVariableFromXMLString(line);
+                    }
+                    if (!skipMeasurement)
+                        measurements.add(m);
+                }
+                if (line.contains("</WEATHERDATA>")) {
+                    Measurement.saveToFileStore(measurements);
+                }
+            }
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         this.closeAndReleaseConnection();
-    }
-
-    private void processInputStream() {
-        // step 4: parse into Measurement objects
-        MeasurementExtractor extractor = new MeasurementExtractor(this.inputStream, new MeasurementParser());
-
-        List<Measurement> measurementsData = extractor.extractDataFromXML();
-        if (measurementsData == null) {
-            this.closeAndReleaseConnection();
-            return;
-        }
-
-        // step 5: make corrections
-//  @TODO: have to determine how to actually do this, might need to change up the application quite a bit
-//        measurementsData.forEach(MeasurementCorrection::correctMeasurement);
-
-        // step 6 & 7: prep and exec insert queries
-        try {
-            Measurement.saveBatch(measurementsData, this.dbConnection);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     private void openClientInputStream() {
         try {
             this.inputStream = this.clientSocket.getInputStream();
         } catch (Exception e) {
-            App.LOGGER.log(Level.WARNING, e.getMessage()+"\n");
+            App.LOGGER.log(Level.WARNING, e.getMessage() + "\n");
         }
     }
 

@@ -1,11 +1,16 @@
 package com.tempus_indicium.app;
 
 import com.tempus_indicium.app.db.DB;
+import com.tempus_indicium.app.db.FileStore;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -38,8 +43,7 @@ public class MasterThread extends Thread {
         // step 1
         this.setupServerSocket(App.SERVER_PORT);
 
-        //noinspection InfiniteLoopStatement
-        while (true) {
+        while (workersCounter < 800) {
             Socket clientSocket = this.acceptNewClient();
             if (clientSocket != null) {
                 // step 2: add a new dbConnection if needed
@@ -50,6 +54,21 @@ public class MasterThread extends Thread {
                 workersCounter++;
                 App.LOGGER.log(Level.INFO, "Current workers: "+workersCounter);
             }
+        }
+
+        //noinspection InfiniteLoopStatement
+        while (true) {
+            try {
+                Thread.sleep(500);
+                try {
+                    FileStore.writeToFileIfNeeded();
+                } catch (ConcurrentModificationException e) {
+                    Thread.sleep(500);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
         }
     }
 

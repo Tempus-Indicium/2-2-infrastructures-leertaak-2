@@ -68,82 +68,82 @@ public class MeasurementExtractor extends DefaultHandler {
     public void endElement(String uri, String localName, String qName) throws SAXException {
         // the text in a closing xml tag
         // use qName to identify the tag
-        switch (qName.toUpperCase()) {
-            // </MEASUREMENT>
-            case "MEASUREMENT":
-//                System.out.println("closing measurement tag and adding it to the list");
-                this.measurementsData.add(newMeasurement);
-                break;
-            case "WEATHERDATA":
-                // literally throw an exception to stop sax from parsing
-                throw new EndOfMeasurementsException();
-            case "STN":
-                this.newMeasurement.setStn(this.measurementParser.stn(this.currentTagValue));
-                break;
-            case "DATE":
-                this.newMeasurement.setAcquisitionDate(this.measurementParser.acquisitionDate(this.currentTagValue));
-                break;
-            case "TIME":
-                this.newMeasurement.setAcquisitionTime(this.measurementParser.acquisitionTime(this.currentTagValue));
-                break;
-            case "TEMP":
-                this.newMeasurement.setTemperature(this.measurementParser.standardDouble(this.currentTagValue));
-                break;
-            case "DEWP":
-                this.newMeasurement.setDew(this.measurementParser.standardDouble(this.currentTagValue));
-                break;
-            case "STP":
-                this.newMeasurement.setStationPressure(this.measurementParser.standardDouble(this.currentTagValue));
-                break;
-            case "SLP":
-                this.newMeasurement.setSeaPressure(this.measurementParser.standardDouble(this.currentTagValue));
-                break;
-            case "VISIB":
-                this.newMeasurement.setVisibility(this.measurementParser.standardDouble(this.currentTagValue));
-                break;
-            case "WDSP":
-                this.newMeasurement.setWindSpeed(this.measurementParser.standardDouble(this.currentTagValue));
-                break;
-            case "PRCP":
-                this.newMeasurement.setRainfall(this.measurementParser.standardDouble(this.currentTagValue));
-                break;
-            case "SNDP":
-                this.newMeasurement.setSnowfall(this.measurementParser.standardDouble(this.currentTagValue));
-                break;
-            case "FRSHTT":
-                // do per bit check + set true
-                if (this.currentTagValue.length() < 6)
-                    break;
-
-                if (this.currentTagValue.charAt(0) == '1') {
-                    this.newMeasurement.setFreeze(true);
-                }
-                if (this.currentTagValue.charAt(1) == '1') {
-                    this.newMeasurement.setRain(true);
-                }
-                if (this.currentTagValue.charAt(2) == '1') {
-                    this.newMeasurement.setSnow(true);
-                }
-                if (this.currentTagValue.charAt(3) == '1') {
-                    this.newMeasurement.setHail(true);
-                }
-                if (this.currentTagValue.charAt(4) == '1') {
-                    this.newMeasurement.setStorm(true);
-                }
-                if (this.currentTagValue.charAt(5) == '1') {
-                    this.newMeasurement.setTornado(true);
-                }
-                break;
-            case "CLDC":
-                this.newMeasurement.setCloudiness(this.measurementParser.standardDouble(this.currentTagValue));
-                break;
-            case "WNDDIR":
-                this.newMeasurement.setWindDirection(this.measurementParser.windDirection(this.currentTagValue));
-                break;
+//        switch (qName.toUpperCase()) {
+//            // </MEASUREMENT>
+//            case "MEASUREMENT":
+////                System.out.println("closing measurement tag and adding it to the list");
+//                this.measurementsData.add(newMeasurement);
+//                break;
+//            case "WEATHERDATA":
+//                // literally throw an exception to stop sax from parsing
+//                throw new EndOfMeasurementsException();
+//            case "STN":
+//                this.newMeasurement.setStn(this.measurementParser.stn(this.currentTagValue));
+//                break;
+//            case "DATE":
+//                this.newMeasurement.setAcquisitionDate(this.measurementParser.acquisitionDate(this.currentTagValue));
+//                break;
+//            case "TIME":
+//                this.newMeasurement.setAcquisitionTime(this.measurementParser.acquisitionTime(this.currentTagValue));
+//                break;
+//            case "TEMP":
+//                this.newMeasurement.setTemperature(this.measurementParser.standardDouble(this.currentTagValue));
+//                break;
+//            case "DEWP":
+//                this.newMeasurement.setDew(this.measurementParser.standardDouble(this.currentTagValue));
+//                break;
+//            case "STP":
+//                this.newMeasurement.setStationPressure(this.measurementParser.standardDouble(this.currentTagValue));
+//                break;
+//            case "SLP":
+//                this.newMeasurement.setSeaPressure(this.measurementParser.standardDouble(this.currentTagValue));
+//                break;
+//            case "VISIB":
+//                this.newMeasurement.setVisibility(this.measurementParser.standardDouble(this.currentTagValue));
+//                break;
+//            case "WDSP":
+//                this.newMeasurement.setWindSpeed(this.measurementParser.standardDouble(this.currentTagValue));
+//                break;
+//            case "PRCP":
+//                this.newMeasurement.setRainfall(this.measurementParser.standardDouble(this.currentTagValue));
+//                break;
+//            case "SNDP":
+//                this.newMeasurement.setSnowfall(this.measurementParser.standardDouble(this.currentTagValue));
+//                break;
+//            case "FRSHTT":
+//                // do per bit check + set true
+//                if (this.currentTagValue.length() < 6)
+//                    break;
+//
+//                if (this.currentTagValue.charAt(0) == '1') {
+//                    this.newMeasurement.setFreeze(true);
+//                }
+//                if (this.currentTagValue.charAt(1) == '1') {
+//                    this.newMeasurement.setRain(true);
+//                }
+//                if (this.currentTagValue.charAt(2) == '1') {
+//                    this.newMeasurement.setSnow(true);
+//                }
+//                if (this.currentTagValue.charAt(3) == '1') {
+//                    this.newMeasurement.setHail(true);
+//                }
+//                if (this.currentTagValue.charAt(4) == '1') {
+//                    this.newMeasurement.setStorm(true);
+//                }
+//                if (this.currentTagValue.charAt(5) == '1') {
+//                    this.newMeasurement.setTornado(true);
+//                }
+//                break;
+//            case "CLDC":
+//                this.newMeasurement.setCloudiness(this.measurementParser.standardDouble(this.currentTagValue));
+//                break;
+//            case "WNDDIR":
+//                this.newMeasurement.setWindDirection(this.measurementParser.windDirection(this.currentTagValue));
+//                break;
 //            default:
 //                System.out.println(qName + ":"+ this.currentTagValue);
 //                break;
-        }
+//        }
     }
 
     @Override

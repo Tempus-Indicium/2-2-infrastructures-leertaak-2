@@ -1,11 +1,19 @@
 package com.tempus_indicium.app.db;
 
+import com.tempus_indicium.app.App;
+
 import java.lang.reflect.Field;
-import java.sql.*;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-
-import static java.sql.Statement.EXECUTE_FAILED;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by peterzen on 2016-12-23.
@@ -15,25 +23,30 @@ public class Measurement extends Model {
     private static final String db_table = "measurements";
     private List<String> missingVariables;
 
-    private Integer stn;
-    private Date acquisition_date;
-    private Time acquisition_time;
-    private Double temperature;
-    private Double dew;
-    private Double station_pressure;
-    private Double sea_pressure;
-    private Double visibility;
-    private Double wind_speed;
-    private Double rainfall;
-    private Double snowfall;
-    private Boolean did_freeze;
-    private Boolean did_rain;
-    private Boolean did_snow;
-    private Boolean did_hail;
-    private Boolean did_storm;
-    private Boolean did_tornado;
-    private Double cloudiness;
-    private Integer wind_direction;
+    public String dateString = null;
+    public String timeString = null;
+
+    private byte[] stn;
+    private byte[] stnName;
+    private byte[] stnCountry;
+    private byte[] acquisition_datetime;
+    private byte[] temperature;
+    private byte[] dew;
+    private byte[] station_pressure;
+    private byte[] sea_pressure;
+    private byte[] visibility;
+    private byte[] wind_speed;
+    private byte[] rainfall;
+    private byte[] snowfall;
+    private byte[] did_freeze;
+    private byte[] did_rain;
+    private byte[] did_snow;
+    private byte[] did_hail;
+    private byte[] did_storm;
+    private byte[] did_tornado;
+    private byte[] cloudiness;
+    private byte[] wind_direction;
+    private byte events;
 
     public Measurement() {
         this.missingVariables = new LinkedList<>();
@@ -48,11 +61,8 @@ public class Measurement extends Model {
     }
 
     public boolean hasMissingData() {
-        if (this.acquisition_date == null) {
+        if (this.acquisition_datetime == null) {
             this.missingVariables.add("acquisition_date");
-        }
-        if (this.acquisition_time == null) {
-            this.missingVariables.add("acquisition_time");
         }
         if (this.temperature == null) {
             this.missingVariables.add("temperature");
@@ -105,222 +115,329 @@ public class Measurement extends Model {
         return !this.missingVariables.isEmpty();
     }
 
-    @Override
-    public String toString() {
-        return "Measurement{" +
-                "stn=" + stn +
-                ", acquisition_date=" + acquisition_date +
-                ", acquisition_time=" + acquisition_time +
-                ", temperature=" + temperature +
-                ", dew=" + dew +
-                ", station_pressure=" + station_pressure +
-                ", sea_pressure=" + sea_pressure +
-                ", visibility=" + visibility +
-                ", wind_speed=" + wind_speed +
-                ", rainfall=" + rainfall +
-                ", snowfall=" + snowfall +
-                ", did_freeze=" + did_freeze +
-                ", did_rain=" + did_rain +
-                ", did_snow=" + did_snow +
-                ", did_hail=" + did_hail +
-                ", did_storm=" + did_storm +
-                ", did_tornado=" + did_tornado +
-                ", cloudiness=" + cloudiness +
-                ", wind_direction=" + wind_direction +
-                '}';
+    public void setVariableFromXMLString(String xmlString) {
+        if (xmlString.contains("<DATE>")) {
+            String strDate;
+            if ((strDate = this.findMatchInXMLString(App.xmlPatterns.get("date"), xmlString)) != null) {
+                if (this.timeString != null) {
+                    this.setAcquisitionDateTime(strDate, this.timeString);
+                } else {
+                    this.dateString = strDate;
+                }
+            }
+        }
+        if (xmlString.contains("<TIME>")) {
+            String time;
+            if ((time = this.findMatchInXMLString(App.xmlPatterns.get("time"), xmlString)) != null) {
+                if (this.dateString != null) {
+                    this.setAcquisitionDateTime(this.dateString, time);
+                } else {
+                    this.timeString = time;
+                }
+            }
+        }
+        if (xmlString.contains("<TEMP>")) {
+            String temp;
+            if ((temp = this.findMatchInXMLString(App.xmlPatterns.get("temp"), xmlString)) != null) {
+                this.setTemperature(temp);
+            }
+        }
+        if (xmlString.contains("<DEWP>")) {
+            String dewp;
+            if ((dewp = this.findMatchInXMLString(App.xmlPatterns.get("dewp"), xmlString)) != null) {
+                this.setDew(dewp);
+            }
+        }
+        if (xmlString.contains("<STP>")) {
+            String stp;
+            if ((stp = this.findMatchInXMLString(App.xmlPatterns.get("stp"), xmlString)) != null) {
+                this.setStationPressure(stp);
+            }
+        }
+        if (xmlString.contains("<SLP>")) {
+            String slp;
+            if ((slp = this.findMatchInXMLString(App.xmlPatterns.get("slp"), xmlString)) != null) {
+                this.setSeaPressure(slp);
+            }
+        }
+        if (xmlString.contains("<VISIB>")) {
+            String visib;
+            if ((visib = this.findMatchInXMLString(App.xmlPatterns.get("visib"), xmlString)) != null) {
+                this.setVisibility(visib);
+            }
+        }
+        if (xmlString.contains("<WDSP>")) {
+            String wdsp;
+            if ((wdsp = this.findMatchInXMLString(App.xmlPatterns.get("wdsp"), xmlString)) != null) {
+                this.setWindSpeed(wdsp);
+            }
+        }
+        if (xmlString.contains("<PRCP>")) {
+            String prcp;
+            if ((prcp = this.findMatchInXMLString(App.xmlPatterns.get("prcp"), xmlString)) != null) {
+                this.setRainfall(prcp);
+            }
+        }
+        if (xmlString.contains("<SNDP>")) {
+            String sndp;
+            if ((sndp = this.findMatchInXMLString(App.xmlPatterns.get("sndp"), xmlString)) != null) {
+                this.setSnowfall(sndp);
+            }
+        }
+        if (xmlString.contains("<FRSHTT>")) {
+            String frshtt;
+            if ((frshtt = this.findMatchInXMLString(App.xmlPatterns.get("frshtt"), xmlString)) != null) {
+                byte events = 0;
+                // NOTICE: Freeze is bit 0
+                if (frshtt.charAt(0) == '1')
+                    events = (byte) (events | (1));
+
+                if (frshtt.charAt(1) == '1')
+                    events = (byte) (events | (1 << 1));
+
+                if (frshtt.charAt(2) == '1')
+                    events = (byte) (events | (1 << 2));
+
+                if (frshtt.charAt(3) == '1')
+                    events = (byte) (events | (1 << 3));
+
+                if (frshtt.charAt(4) == '1')
+                    events = (byte) (events | (1 << 4));
+
+                if (frshtt.charAt(5) == '1')
+                    events = (byte) (events | (1 << 5));
+
+                this.events = events;
+            }
+        }
+        if (xmlString.contains("<CLDC>")) {
+            String cldc;
+            if ((cldc = this.findMatchInXMLString(App.xmlPatterns.get("cldc"), xmlString)) != null) {
+                this.setCloudiness(cldc);
+            }
+        }
+        if (xmlString.contains("<WNDDIR>")) {
+            String wnddir;
+            if ((wnddir = this.findMatchInXMLString(App.xmlPatterns.get("wnddir"), xmlString)) != null) {
+                this.setWindDirection(wnddir);
+            }
+        }
     }
 
-    public void setStn(Integer stn) {
-        this.stn = stn;
+    public boolean setStnFromXmlString(String xmlString) {
+        String stn;
+        if ((stn = this.findMatchInXMLString(App.xmlPatterns.get("stn"), xmlString)) != null) {
+            String[] stnDetails;
+            if ((stnDetails = FileStore.stations.get(Integer.parseInt(stn))) != null) {
+                // station details found
+                this.setStn(stnDetails[0]);
+                this.setStnName(stnDetails[1]);
+                this.setStnCountry(stnDetails[2]);
+                return true;
+            }
+        }
+        return false;
     }
 
-    public void setAcquisitionDate(Date acquisitionDate) {
-        this.acquisition_date = acquisitionDate;
+    private String findMatchInXMLString(Pattern pattern, String xmlString) {
+        Matcher matcher = pattern.matcher(xmlString);
+        if (matcher.find()) {
+            return matcher.group();
+        }
+        return null;
     }
 
-    public void setAcquisitionTime(Time acquisitionTime) {
-        this.acquisition_time = acquisitionTime;
+    private void setStn(String stn) {
+        int intStn = Integer.parseInt(stn);
+        this.stn = new byte[]{
+                (byte) ((intStn >> 16) & 0xFF),
+                (byte) ((intStn >> 8) & 0xFF),
+                (byte) (intStn & 0xFF)
+        };
+//        System.out.println(this.stn[0] + ":" + this.stn[1] + ":" + this.stn[2]); // debug bytes
     }
 
-    public void setTemperature(Double temperature) {
-        this.temperature = temperature;
-    }
-
-    public void setDew(Double dew) {
-        this.dew = dew;
-    }
-
-    public void setStationPressure(Double station_pressure) {
-        this.station_pressure = station_pressure;
-    }
-
-    public void setSeaPressure(Double sea_pressure) {
-        this.sea_pressure = sea_pressure;
-    }
-
-    public void setVisibility(Double visibility) {
-        this.visibility = visibility;
-    }
-
-    public void setWindSpeed(Double wind_speed) {
-        this.wind_speed = wind_speed;
-    }
-
-    public void setRainfall(Double rainfall) {
-        this.rainfall = rainfall;
-    }
-
-    public void setSnowfall(Double snowfall) {
-        this.snowfall = snowfall;
-    }
-
-    public void setFreeze(Boolean did_freeze) {
-        this.did_freeze = did_freeze;
-    }
-
-    public void setRain(Boolean did_rain) {
-        this.did_rain = did_rain;
-    }
-
-    public void setSnow(Boolean did_snow) {
-        this.did_snow = did_snow;
-    }
-
-    public void setHail(Boolean did_hail) {
-        this.did_hail = did_hail;
-    }
-
-    public void setStorm(Boolean did_storm) {
-        this.did_storm = did_storm;
-    }
-
-    public void setTornado(Boolean did_tornado) {
-        this.did_tornado = did_tornado;
-    }
-
-    public void setCloudiness(Double cloudiness) {
-        this.cloudiness = cloudiness;
-    }
-
-    public void setWindDirection(Integer wind_direction) {
-        this.wind_direction = wind_direction;
-    }
-
-    public static boolean saveBatch(List<Measurement> measurements, Connection conn) throws SQLException {
-        // INSERT INTO `unwdmi`.`measurements` (`stn`, `acquisition_date`, `acquisition_time`, `temperature`, `dew`, `station_pressure`, `sea_pressure`, `visibility`, `wind_speed`, `rainfall`, `snowfall`, `did_freeze`, `did_rain`, `did_snow`, `did_hail`, `did_storm`, `did_tornado`, `cloudiness`, `wind_direction`) VALUES ('1', '2017-01-14', '15:40', '20.0', '23.20', '10.0', '5.0', '59', '4', '10', '5', '1', '1', '1', '0', '0', '0', '10', '300');
-        String columns = "(`stn`, `acquisition_date`, `acquisition_time`, `temperature`, `dew`, `station_pressure`, `sea_pressure`, `visibility`, `wind_speed`, `rainfall`, `snowfall`, `did_freeze`, `did_rain`, `did_snow`, `did_hail`, `did_storm`, `did_tornado`, `cloudiness`, `wind_direction`)";
-
-        String sql = "INSERT INTO " + Measurement.db_table + " " + columns + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        PreparedStatement preparedStatement = conn.prepareStatement(sql);
-
-        for (Measurement m : measurements) {
-            // set ps values
-            m.prepSetters(preparedStatement); // prepare the PreparedStatement object for this measurement
-            preparedStatement.addBatch();
+    private void setAcquisitionDateTime(String acquisitionDate, String acquisitionTime) {
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            Date date = format.parse(acquisitionDate + " " + acquisitionTime);
+            this.acquisition_datetime = ByteBuffer.allocate(4).putInt(((int) date.getTime())).array();
+        } catch (ParseException e) {
+            this.acquisition_datetime = ByteBuffer.allocate(4).putInt(0).array();
         }
 
-        int[] result = preparedStatement.executeBatch();
-        preparedStatement.close();
-
-        return result[0] != EXECUTE_FAILED;
     }
 
-    private PreparedStatement prepSetters(PreparedStatement preparedStatement) throws SQLException {
-        if (this.stn != null) {
-            preparedStatement.setInt(1, this.stn);
-        } else {
-            preparedStatement.setNull(1, Types.INTEGER);
+    private void setTemperature(String temperature) {
+        // signed integer(actually float) (2 bytes) (NOTICE: var is multiplied by 10)
+        int intTemp = (int) Float.parseFloat(temperature) * 10;
+        this.temperature = new byte[]{
+                (byte) ((intTemp >> 8) & 0xFF),
+                (byte) (intTemp & 0xFF)
+        };
+    }
+
+    private void setDew(String dew) {
+        // signed integer(actually float) (2 bytes) (NOTICE: var is multiplied by 10)
+        int intDew = (int) Float.parseFloat(dew) * 10;
+        this.dew = new byte[]{
+                (byte) ((intDew >> 8) & 0xFF),
+                (byte) (intDew & 0xFF)
+        };
+    }
+
+    private void setStationPressure(String station_pressure) {
+        // unsigned integer(actually float) (3 bytes) (NOTICE: var is multiplied by 10)
+        int intPressure = (int) Float.parseFloat(station_pressure) * 10;
+        this.station_pressure = new byte[]{
+                (byte) ((intPressure >> 16) & 0xFF),
+                (byte) ((intPressure >> 8) & 0xFF),
+                (byte) (intPressure & 0xFF)
+        };
+    }
+
+    private void setSeaPressure(String sea_pressure) {
+        // unsigned integer(actually float) (3 bytes) (NOTICE: var is multiplied by 10)
+        int intPressure = (int) Float.parseFloat(sea_pressure) * 10;
+        this.sea_pressure = new byte[]{
+                (byte) ((intPressure >> 16) & 0xFF),
+                (byte) ((intPressure >> 8) & 0xFF),
+                (byte) (intPressure & 0xFF)
+        };
+    }
+
+    private void setVisibility(String visibility) {
+        // unsigned integer(actually float) (2 bytes) (NOTICE: var is multiplied by 10)
+        int intVisibility = (int) Float.parseFloat(visibility) * 10;
+        this.visibility = new byte[]{
+                (byte) ((intVisibility >> 8) & 0xFF),
+                (byte) (intVisibility & 0xFF)
+        };
+    }
+
+    private void setWindSpeed(String wind_speed) {
+        // unsigned integer(actually float) (2 bytes) (NOTICE: var is multiplied by 10)
+        int intWindSpeed = (int) Float.parseFloat(wind_speed) * 10;
+        this.wind_speed = new byte[]{
+                (byte) ((intWindSpeed >> 8) & 0xFF),
+                (byte) (intWindSpeed & 0xFF)
+        };
+    }
+
+    private void setRainfall(String rainfall) {
+        // unsigned integer(actually float) (2 bytes) (NOTICE: var is multiplied by 100)
+        int intRainfall = (int) Float.parseFloat(rainfall) * 100;
+        this.rainfall = new byte[]{
+                (byte) ((intRainfall >> 16) & 0xFF),
+                (byte) ((intRainfall >> 8) & 0xFF),
+                (byte) (intRainfall & 0xFF)
+        };
+    }
+
+    private void setSnowfall(String snowfall) {
+        // ! signed integer(actually float) (3 bytes) (NOTICE: var is multiplied by 10)
+        int intSnowfall = (int) Float.parseFloat(snowfall) * 10;
+        this.snowfall = new byte[]{
+                (byte) ((intSnowfall >> 16) & 0xFF),
+                (byte) ((intSnowfall >> 8) & 0xFF),
+                (byte) (intSnowfall & 0xFF)
+        };
+    }
+
+    private void setCloudiness(String cloudiness) {
+        // unsigned integer(actually float) (2 bytes) (NOTICE: var is multiplied by 10)
+        int intCloudiness = (int) Float.parseFloat(cloudiness) * 10;
+        this.cloudiness = new byte[]{
+                (byte) ((intCloudiness >> 8) & 0xFF),
+                (byte) (intCloudiness & 0xFF)
+        };
+    }
+
+    private void setWindDirection(String wind_direction) {
+        // unsigned integer (0 - 359) (2 bytes)
+        int intWindDirection = Integer.parseInt(wind_direction);
+        this.wind_direction = new byte[]{
+                (byte) ((intWindDirection >> 8) & 0xFF),
+                (byte) (intWindDirection & 0xFF)
+        };
+    }
+
+    public static void saveToFileStore(Set<Measurement> measurements) { // might need to add synchronized when every1 starts writing
+        try {
+
+            measurements.forEach(measurement -> {
+//                    if (measurement.hasMissingData()) {
+//                        List<String> missingVars = measurement.getMissingVariables();
+//                        for (String var : missingVars) {
+//                            Field varField = measurement.getVariable(var);
+//                            Object value = varField.get(measurement);
+//                            if (value == null) {
+//                                // @TODO: object / variable needs corrections
+//                                // for now: use the next else statement to throw-away measurement
+//                            }
+//                        }
+//                    } else {
+                App.measurementRows.add(measurement.getArrayOfByteVariables()); // adds the row to be written
+//                    }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        if (this.acquisition_date != null) {
-            preparedStatement.setDate(2, this.acquisition_date);
-        } else {
-            preparedStatement.setNull(2, Types.DATE);
+    }
+
+    private byte[] getArrayOfByteVariables() {
+        // This function will form the structure of a Measurement row
+        byte[] arr = new byte[13];
+        ByteBuffer wrapper = ByteBuffer.wrap(arr);
+        // 3 bytes for the station identifier
+        wrapper.put(valOrNull(this.stn));
+        // a single byte containing the amount of bytes for the station country (UTF-8)
+//        wrapper.put(new byte[]{(byte) (this.stnCountry.length & 0xFF)});
+//        wrapper.put(valOrNull(this.stnCountry));
+        // a single byte containing the amount of bytes for the station name (UTF-8)
+//        wrapper.put(new byte[]{ (byte) (this.stnCountry.length & 0xFF) });
+//        wrapper.put(valOrNull(this.stnName));
+        // 4 bytes containing the acquisition date and time in unix timestamp format
+        wrapper.put(valOrNull(this.acquisition_datetime));
+        // 2 bytes containing the temperature in a value*10 matter to avoid decimals
+        wrapper.put(valOrNull(this.temperature));
+        // 2 bytes containing the dew point in a value*10 matter to avoid decimals
+        wrapper.put(valOrNull(this.dew));
+        // 3 bytes containing the station level pressure in a value*10 matter to avoid decimals
+//        wrapper.put(valOrNull(this.station_pressure));
+        // 3 bytes containing the sea level pressure in a value*10 matter to avoid decimals
+//        wrapper.put(valOrNull(this.sea_pressure));
+        // 2 bytes containing the visibility in a value*10 matter to avoid decimals
+        wrapper.put(valOrNull(this.visibility));
+        // 2 bytes containing the wind speed in a value*10 matter to avoid decimals
+//        wrapper.put(valOrNull(this.wind_speed));
+        // 2 bytes containing the rainfall in a value*10 matter to avoid decimals
+//        wrapper.put(valOrNull(this.rainfall));
+        // 3 bytes containing the snowfall in a value*10 matter to avoid decimals
+//        wrapper.put(valOrNull(this.snowfall));
+        // a single byte with individual bits set for following events:
+        // Freezing[0], Raining[1], Snowing[2], Hailing[3], (T)Storms[4] and Tornados[5]
+//        wrapper.put(new byte[]{this.events});
+        // 2 bytes containing the cloudiness in a value*10 matter to avoid decimals
+//        wrapper.put(valOrNull(this.cloudiness));
+        // 2 bytes containing the wind direction. notice: no decimals, no value * 10.
+//        wrapper.put(valOrNull(this.wind_direction));
+        return wrapper.array();
+    }
+
+    private byte[] valOrNull(byte[] val) {
+        if (val == null) {
+            return new byte[]{(byte) 0};
         }
-        if (this.acquisition_time != null) {
-            preparedStatement.setTime(3, this.acquisition_time);
-        } else {
-            preparedStatement.setNull(3, Types.TIME);
-        }
-        if (this.temperature != null) {
-            preparedStatement.setDouble(4, this.temperature);
-        } else {
-            preparedStatement.setNull(4, Types.DOUBLE);
-        }
-        if (this.dew != null) {
-            preparedStatement.setDouble(5, this.dew);
-        } else {
-            preparedStatement.setNull(5, Types.DOUBLE);
-        }
-        if (this.station_pressure != null) {
-            preparedStatement.setDouble(6, this.station_pressure);
-        } else {
-            preparedStatement.setNull(6, Types.DOUBLE);
-        }
-        if (this.sea_pressure != null) {
-            preparedStatement.setDouble(7, this.sea_pressure);
-        } else {
-            preparedStatement.setNull(7, Types.DOUBLE);
-        }
-        if (this.visibility != null) {
-            preparedStatement.setDouble(8, this.visibility);
-        } else {
-            preparedStatement.setNull(8, Types.DOUBLE);
-        }
-        if (this.wind_speed != null) {
-            preparedStatement.setDouble(9, this.wind_speed);
-        } else {
-            preparedStatement.setNull(9, Types.DOUBLE);
-        }
-        if (this.rainfall != null) {
-            preparedStatement.setDouble(10, this.rainfall);
-        } else {
-            preparedStatement.setNull(10, Types.DOUBLE);
-        }
-        if (this.snowfall != null) {
-            preparedStatement.setDouble(11, this.snowfall);
-        } else {
-            preparedStatement.setNull(11, Types.DOUBLE);
-        }
-        if (this.did_freeze != null) {
-            preparedStatement.setBoolean(12, this.did_freeze);
-        } else {
-            preparedStatement.setNull(12, Types.TINYINT);
-        }
-        if (this.did_rain != null) {
-            preparedStatement.setBoolean(13, this.did_rain);
-        } else {
-            preparedStatement.setNull(13, Types.TINYINT);
-        }
-        if (this.did_snow != null) {
-            preparedStatement.setBoolean(14, this.did_snow);
-        } else {
-            preparedStatement.setNull(14, Types.TINYINT);
-        }
-        if (this.did_hail != null) {
-            preparedStatement.setBoolean(15, this.did_hail);
-        } else {
-            preparedStatement.setNull(15, Types.TINYINT);
-        }
-        if (this.did_storm != null) {
-            preparedStatement.setBoolean(16, this.did_storm);
-        } else {
-            preparedStatement.setNull(16, Types.TINYINT);
-        }
-        if (this.did_tornado != null) {
-            preparedStatement.setBoolean(17, this.did_tornado);
-        } else {
-            preparedStatement.setNull(17, Types.TINYINT);
-        }
-        if (this.cloudiness != null) {
-            preparedStatement.setDouble(18, this.cloudiness);
-        } else {
-            preparedStatement.setNull(18, Types.DOUBLE);
-        }
-        if (this.wind_direction != null) {
-            preparedStatement.setInt(19, this.wind_direction);
-        } else {
-            preparedStatement.setNull(19, Types.INTEGER);
-        }
-        return preparedStatement;
+        return val;
+    }
+
+    private void setStnName(String stnName) {
+        this.stnName = stnName.getBytes(StandardCharsets.UTF_8);
+    }
+
+    private void setStnCountry(String stnCountry) {
+        this.stnCountry = stnCountry.getBytes(StandardCharsets.UTF_8);
     }
 }
