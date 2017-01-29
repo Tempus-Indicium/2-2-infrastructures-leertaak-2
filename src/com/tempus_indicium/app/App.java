@@ -64,7 +64,7 @@ public class App {
 
         App.measurementRows = new ArrayList<>();
         // bytes per measurement is 10, so multiply by 20 for a safe zone
-        byte[] bigByteArray = new byte[Integer.parseInt(App.config.getProperty("ROWS_PER_WRITE")) * 20];
+        byte[] bigByteArray = new byte[Integer.parseInt(App.config.getProperty("ROWS_PER_WRITE")) * 11];
         App.measurementBytes = ByteBuffer.wrap(bigByteArray);
 
         new MasterThread().start();
