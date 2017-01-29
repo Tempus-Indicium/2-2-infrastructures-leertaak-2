@@ -213,6 +213,7 @@ public class Measurement extends Model {
         }
     }
 
+    // returns true if station is in our data store, false otherwise
     public boolean setStnFromXmlString(String xmlString) {
         String stn;
         if ((stn = this.findMatchInXMLString(App.xmlPatterns.get("stn"), xmlString)) != null) {
