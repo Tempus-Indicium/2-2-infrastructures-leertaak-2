@@ -1,19 +1,13 @@
 package com.tempus_indicium.app;
 
-import com.tempus_indicium.app.db.FileStore;
 import com.tempus_indicium.app.db.Measurement;
-import com.tempus_indicium.app.parsing.MeasurementExtractor;
-import com.tempus_indicium.app.parsing.MeasurementParser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.logging.Level;
 
 /**
@@ -21,24 +15,12 @@ import java.util.logging.Level;
  * Part of the 2-2-infrastructures-leertaak-2 project.
  */
 public class WorkerThread extends Thread {
-//    Use this thread to:
-// 1. open the client input stream
-// 2. use a bufferedReader to read through the inputStream
-// 3. build an xml string
-// 4. parse the xml string into Measurement objects
-// 5. make corrections where needed
-// 6. prepare insert queries batch (stmt.addBatch / stmt.executeBatch)
-// 7. execute batch, close statement
     // Note: this Thread is expected to loop as long as the client keeps streaming data
-    // @TODO: Maybe built in some form of time to live to properly close thread
-    // Note: scenario where amount of clients reduces might introduce problems
 
-    private Connection dbConnection;
     private Socket clientSocket;
     private InputStream inputStream;
 
-    public WorkerThread(Connection dbConnection, Socket clientSocket) {
-        this.dbConnection = dbConnection;
+    public WorkerThread(Socket clientSocket) {
         this.clientSocket = clientSocket;
     }
 
@@ -48,9 +30,8 @@ public class WorkerThread extends Thread {
         this.openClientInputStream();
 
         try {
-            HashSet measurements = new HashSet();
             String line;
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(this.inputStream));
             boolean skipMeasurement;
             while ((line = bufferedReader.readLine()) != null) {
                 if (line.contains("<MEASUREMENT>")) {
@@ -71,10 +52,7 @@ public class WorkerThread extends Thread {
                         m.setVariableFromXMLString(line);
                     }
                     if (!skipMeasurement)
-                        measurements.add(m);
-                }
-                if (line.contains("</WEATHERDATA>")) {
-                    Measurement.saveToFileStore(measurements);
+                        App.measurementBytes.put(m.getArrayOfByteVariables());
                 }
             }
 
@@ -97,7 +75,6 @@ public class WorkerThread extends Thread {
     private void closeAndReleaseConnection() {
         try {
             this.clientSocket.close();
-            // @TODO: tell MasterThread that we are donezo, so that it can update the dbConnections as needed
         } catch (Exception e) {
             App.LOGGER.log(Level.WARNING, e.getMessage());
         }

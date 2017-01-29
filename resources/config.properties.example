@@ -1,24 +1,14 @@
-# Database Properties
-DB_USER=
-DB_PASSWORD=
-DB_SERVER=
-DB_PORT=
-DB_DATABASE=
-DB_SYSTEM=
-
-# Application Properties
+# Application server port
 SERVER_PORT=7789
-CLI_LIMIT=5                 # might be deprecated soon, unused at this moment..
-WORKERS_PER_DB_CONN=16
 
 # Location on file-system to use for the file storage
-FILE_STORE_DIR=/PATH/TO/PROJECT/2-2-infrastructures-leertaak-2/out/file-store
+FILE_STORE_DIR=/home/peterzen/Code/Java/2-2-infrastructures-leertaak-2/out/file-store/
 
 # The naming (date) format for our files
-FILE_DATE_FORMAT=yyyy-MM-dd
+FILE_DATE_FORMAT=yyyy-MM-dd-HH
 
 # Path to the stations table export
-STATIONS_CSV=/PATH/TO/PROJECT/2-2-infrastructures-leertaak-2/resources/stations.csv
+STATIONS_CSV=/home/peterzen/Code/Java/2-2-infrastructures-leertaak-2/resources/stations.csv
 
 # The number of measurement rows to store in ram before writing to disk
-ROWS_PER_WRITE=80000
+ROWS_PER_WRITE=10000

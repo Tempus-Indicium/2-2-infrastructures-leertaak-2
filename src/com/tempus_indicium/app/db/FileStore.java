@@ -21,10 +21,12 @@ public class FileStore {
     public static Date currentDate;
     public static File currentFile;
     public static HashMap<Integer, String[]> stations;
+    public static FileOutputStream fileOutputStream;
+//    private static ObjectOutputStream out = new ObjectOutputStream();
 
     // add global vars: _currentDate & _currentFile
 
-    public static void updateDateUpdateFileIfNeeded() {
+    private static synchronized void updateDateUpdateFileIfNeeded() {
         if (FileStore.dateComparedToCurrent() == 0) {
             return;
         }
@@ -35,6 +37,13 @@ public class FileStore {
         // date updated so: create new current file
         String fileName = FileStore.generateFileName(FileStore.currentDate);
         FileStore.newCurrentFile(fileName);
+
+        // update output stream
+        try {
+            FileStore.fileOutputStream = new FileOutputStream(FileStore.currentFile, true);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     public static boolean initializeFileStore() {
@@ -61,15 +70,6 @@ public class FileStore {
         }
 
         return true;
-    }
-
-    public static String getStationString(Integer stnId) {
-        return stations.get(stnId)[0]
-                +","+stations.get(stnId)[1]
-                +","+stations.get(stnId)[2]
-                +","+stations.get(stnId)[3]
-                +","+stations.get(stnId)[4]
-                +","+stations.get(stnId)[5];
     }
 
     // load the stations.csv file in memory so we can match the data for later saving of measurements
@@ -107,27 +107,26 @@ public class FileStore {
         FileStore.currentDate = new Date();
     }
 
-    // check if current date is equal to the variable currentDate
+    // check if current date is equal to the variable FileStore.currentDate
     private static int dateComparedToCurrent() {
         // @TODO: properly implement this function, do not use deprecated methods.
         // its almost 1am and i cba to figure this Java jibber dabber out.
         Date d1 = new Date();
-        Date d2 = new Date();
+        Date d2 = FileStore.currentDate;
         if (d1.getYear() != d2.getYear())
             return d1.getYear() - d2.getYear();
         if (d1.getMonth() != d2.getMonth())
             return d1.getMonth() - d2.getMonth();
+        if (d1.getHours() != d2.getHours())
+            return d1.getHours() - d2.getHours();
         return d1.getDate() - d2.getDate();
     }
 
     private static void newCurrentFile(String fileName) {
         File file = new File(config.getProperty("FILE_STORE_DIR") + fileName);
+
         try {
             if (file.createNewFile()) {
-//                FileWriter fileWriter = new FileWriter(file);
-//                fileWriter.write(config.getProperty("COLUMNS") + System.lineSeparator());
-//                fileWriter.close();
-
                 FileStore.currentFile = file;
             } else {
                 System.out.println("File already exists. But error should be given earlier..");
@@ -166,15 +165,17 @@ public class FileStore {
     }
 
     public static synchronized void writeToFileIfNeeded() {
-        if (App.measurementRows.size() >= Integer.parseInt(App.config.getProperty("ROWS_PER_WRITE"))) {
+        if (App.measurementBytes.remaining() <= Integer.parseInt(App.config.getProperty("ROWS_PER_WRITE")) * 10 ) {
+            System.out.println("PERFORMING WRITE");
+            FileStore.updateDateUpdateFileIfNeeded();
             try {
-                ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(FileStore.currentFile, true));
-                out.writeObject(App.measurementRows);
-                out.close();
+                FileStore.fileOutputStream.write(App.measurementBytes.array());
+                FileStore.fileOutputStream.flush();
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                App.measurementRows.clear();
+                App.measurementBytes.clear();
+                System.out.println("CLEARING LIST");
             }
         }
     }
