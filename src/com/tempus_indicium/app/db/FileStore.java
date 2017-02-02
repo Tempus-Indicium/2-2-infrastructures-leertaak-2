@@ -165,8 +165,9 @@ public class FileStore {
     }
 
     public static synchronized void writeToFileIfNeeded() {
-        if (App.measurementBytes.remaining() <= 64000 ) {
+        if (App.measurementBytes.remaining() <= 16000 ) {
             System.out.println("PERFORMING WRITE");
+            App.measurementBytes.put(new byte[]{ (byte) 0xFF, (byte) 0xFF }); // write bytes to recognize padding
             FileStore.updateDateUpdateFileIfNeeded();
             try {
                 FileStore.fileOutputStream.write(App.measurementBytes.array());

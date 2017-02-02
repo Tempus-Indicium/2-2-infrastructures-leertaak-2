@@ -63,8 +63,8 @@ public class App {
 //        xmlPatterns.put("wnddir", Pattern.compile("([0-9]+)"));
 
         App.measurementRows = new ArrayList<>();
-        // bytes per measurement is 10, *11 for some extra padding
-        byte[] bigByteArray = new byte[Integer.parseInt(App.config.getProperty("ROWS_PER_WRITE")) * 20];
+        // bytes per measurement is 10, plus some for extra padding
+        byte[] bigByteArray = new byte[Integer.parseInt(App.config.getProperty("ROWS_PER_WRITE")) * 10];
         App.measurementBytes = ByteBuffer.wrap(bigByteArray);
 
         new MasterThread().start();

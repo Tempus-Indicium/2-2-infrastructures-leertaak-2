@@ -29,13 +29,13 @@ public class WorkerThread extends Thread {
         // step 1
         this.openClientInputStream();
 
-        while (MasterThread.workersCounter < 800) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+//        while (MasterThread.workersCounter < 800) {
+//            try {
+//                Thread.sleep(100);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
         try {
             String line;
@@ -59,7 +59,7 @@ public class WorkerThread extends Thread {
 
                         m.setVariableFromXMLString(line);
                     }
-                    if (!skipMeasurement)
+                    if (!skipMeasurement && MasterThread.workersCounter == 800)
                         App.measurementBytes.put(m.getArrayOfByteVariables());
                 }
             }
