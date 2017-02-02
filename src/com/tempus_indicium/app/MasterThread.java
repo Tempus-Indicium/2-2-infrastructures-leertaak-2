@@ -13,24 +13,25 @@ import java.util.logging.Level;
  */
 public class MasterThread extends Thread {
     private ServerSocket serverSocket;
+    public static int workersCounter;
 
     public MasterThread() {
     }
 
     @Override
     public void run() {
-        int workersCounter = 0;
+        MasterThread.workersCounter = 0;
 
         // step 1
         this.setupServerSocket(App.SERVER_PORT);
 
-        while (workersCounter < 800) {
+        while (MasterThread.workersCounter < 800) {
             Socket clientSocket = this.acceptNewClient();
 
             if (clientSocket != null) {
                 new WorkerThread(clientSocket).start();
-                workersCounter++;
-                App.LOGGER.log(Level.INFO, "Current workers: "+workersCounter);
+                MasterThread.workersCounter++;
+                App.LOGGER.log(Level.INFO, "Current workers: "+MasterThread.workersCounter);
             }
         }
 

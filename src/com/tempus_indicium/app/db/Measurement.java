@@ -87,6 +87,7 @@ public class Measurement {
 //        System.out.println(this.stn[0] + ":" + this.stn[1]); // debug bytes
     }
 
+    // @TODO: debug and solve potential bug with the saving of time (timestamps do not make sense when reading)
     private void setAcquisitionTime(String acquisitionTime) {
         DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
         try {

@@ -165,7 +165,7 @@ public class FileStore {
     }
 
     public static synchronized void writeToFileIfNeeded() {
-        if (App.measurementBytes.remaining() <= Integer.parseInt(App.config.getProperty("ROWS_PER_WRITE")) * 10 ) {
+        if (App.measurementBytes.remaining() <= 64000 ) {
             System.out.println("PERFORMING WRITE");
             FileStore.updateDateUpdateFileIfNeeded();
             try {

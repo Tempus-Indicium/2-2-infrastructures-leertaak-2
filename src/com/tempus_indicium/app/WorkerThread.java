@@ -29,6 +29,14 @@ public class WorkerThread extends Thread {
         // step 1
         this.openClientInputStream();
 
+        while (MasterThread.workersCounter < 800) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
         try {
             String line;
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(this.inputStream));
