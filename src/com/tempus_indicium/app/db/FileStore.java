@@ -164,20 +164,17 @@ public class FileStore {
         return fileMissing[0];
     }
 
-    public static synchronized void writeToFileIfNeeded() {
-        if (App.measurementBytes.remaining() <= 16000 ) {
-            System.out.println("PERFORMING WRITE");
-            App.measurementBytes.put(new byte[]{ (byte) 0xFF, (byte) 0xFF }); // write bytes to recognize padding
-            FileStore.updateDateUpdateFileIfNeeded();
-            try {
-                FileStore.fileOutputStream.write(App.measurementBytes.array());
-                FileStore.fileOutputStream.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                App.measurementBytes.clear();
-                System.out.println("CLEARING LIST");
-            }
+    public static synchronized void writeToFile() {
+        System.out.println("PERFORMING WRITE");
+        FileStore.updateDateUpdateFileIfNeeded();
+        try {
+            FileStore.fileOutputStream.write(App.measurementBytes.array());
+            FileStore.fileOutputStream.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            App.measurementBytes.clear();
+            System.out.println("CLEARING LIST");
         }
     }
 }

@@ -34,21 +34,6 @@ public class MasterThread extends Thread {
                 App.LOGGER.log(Level.INFO, "Current workers: "+MasterThread.workersCounter);
             }
         }
-
-        //noinspection InfiniteLoopStatement
-        while (true) {
-            try {
-                Thread.sleep(10);
-                try {
-                    FileStore.writeToFileIfNeeded();
-                } catch (ConcurrentModificationException e) {
-                    Thread.sleep(10);
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-        }
     }
 
     private Socket acceptNewClient() {

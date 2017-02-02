@@ -1,5 +1,6 @@
 package com.tempus_indicium.app;
 
+import com.tempus_indicium.app.db.FileStore;
 import com.tempus_indicium.app.db.Measurement;
 
 import java.io.BufferedReader;
@@ -7,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.nio.BufferOverflowException;
 import java.util.HashSet;
 import java.util.logging.Level;
 
@@ -59,8 +61,14 @@ public class WorkerThread extends Thread {
 
                         m.setVariableFromXMLString(line);
                     }
-                    if (!skipMeasurement && MasterThread.workersCounter == 800)
-                        App.measurementBytes.put(m.getArrayOfByteVariables());
+                    if (!skipMeasurement && MasterThread.workersCounter == 800) {
+                        try {
+                            App.measurementBytes.put(m.getArrayOfByteVariables());
+                        } catch (BufferOverflowException e) {
+                            FileStore.writeToFile();
+                            App.measurementBytes.put(m.getArrayOfByteVariables());
+                        }
+                    }
                 }
             }
 
