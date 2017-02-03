@@ -40,8 +40,9 @@ public class FileStore {
 
         // update output stream
         try {
+            FileStore.fileOutputStream.close();
             FileStore.fileOutputStream = new FileOutputStream(FileStore.currentFile, true);
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -165,16 +166,18 @@ public class FileStore {
     }
 
     public static synchronized void writeToFile() {
-        System.out.println("PERFORMING WRITE");
-        FileStore.updateDateUpdateFileIfNeeded();
-        try {
-            FileStore.fileOutputStream.write(App.measurementBytes.array());
-            FileStore.fileOutputStream.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            App.measurementBytes.clear();
-            System.out.println("CLEARING LIST");
+        if (App.measurementBytes.remaining() == 0) {
+            System.out.println("PERFORMING WRITE");
+            FileStore.updateDateUpdateFileIfNeeded();
+            try {
+                FileStore.fileOutputStream.write(App.measurementBytes.array());
+                FileStore.fileOutputStream.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                App.measurementBytes.clear();
+                System.out.println("CLEARING LIST");
+            }
         }
     }
 }

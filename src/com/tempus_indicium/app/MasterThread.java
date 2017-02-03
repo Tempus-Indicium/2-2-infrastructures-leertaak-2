@@ -1,10 +1,9 @@
 package com.tempus_indicium.app;
 
-import com.tempus_indicium.app.db.FileStore;
-
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ConcurrentModificationException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 
 /**
@@ -25,15 +24,18 @@ public class MasterThread extends Thread {
         // step 1
         this.setupServerSocket(App.SERVER_PORT);
 
-        while (MasterThread.workersCounter < 800) {
+        List<WorkerThread> workers = new LinkedList<>();
+
+        while (MasterThread.workersCounter < 600) {
             Socket clientSocket = this.acceptNewClient();
 
             if (clientSocket != null) {
-                new WorkerThread(clientSocket).start();
+                workers.add(new WorkerThread(clientSocket));
                 MasterThread.workersCounter++;
                 App.LOGGER.log(Level.INFO, "Current workers: "+MasterThread.workersCounter);
             }
         }
+        workers.forEach(Thread::start);
     }
 
     private Socket acceptNewClient() {

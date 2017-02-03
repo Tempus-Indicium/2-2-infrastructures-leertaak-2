@@ -61,7 +61,7 @@ public class WorkerThread extends Thread {
 
                         m.setVariableFromXMLString(line);
                     }
-                    if (!skipMeasurement && MasterThread.workersCounter == 800) {
+                    if (!skipMeasurement && MasterThread.workersCounter == 600) {
                         try {
                             App.measurementBytes.put(m.getArrayOfByteVariables());
                         } catch (BufferOverflowException e) {
