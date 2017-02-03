@@ -171,7 +171,7 @@ public class FileStore {
             FileStore.updateDateUpdateFileIfNeeded();
             try {
                 FileStore.fileOutputStream.write(App.measurementBytes.array());
-                FileStore.fileOutputStream.flush();
+                FileStore.fileOutputStream.flush(); // zou hier nog wat kunnen zijn
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {

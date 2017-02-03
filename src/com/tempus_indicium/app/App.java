@@ -6,9 +6,7 @@ import com.tempus_indicium.app.db.FileStore;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,7 +23,7 @@ public class App {
     public final static int SERVER_PORT = Integer.parseInt(config.getProperty("SERVER_PORT"));
 
     public static HashMap<String, Pattern> xmlPatterns;
-    public static List<byte[]> measurementRows;
+//    public static List<byte[]> measurementRows;
     public static ByteBuffer measurementBytes;
 
     /**
@@ -62,8 +60,8 @@ public class App {
 //        xmlPatterns.put("cldc", Pattern.compile("([0-9.]+)"));
 //        xmlPatterns.put("wnddir", Pattern.compile("([0-9]+)"));
 
-        App.measurementRows = new ArrayList<>();
-        // bytes per measurement is 10, plus some for extra padding
+//        App.measurementRows = new ArrayList<>();
+        // bytes per measurement is 10
         byte[] bigByteArray = new byte[Integer.parseInt(App.config.getProperty("ROWS_PER_WRITE")) * 10];
         App.measurementBytes = ByteBuffer.wrap(bigByteArray);
 

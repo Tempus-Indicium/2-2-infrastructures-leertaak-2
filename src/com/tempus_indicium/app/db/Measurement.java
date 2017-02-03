@@ -2,16 +2,11 @@ package com.tempus_indicium.app.db;
 
 import com.tempus_indicium.app.App;
 
-import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -175,6 +170,7 @@ public class Measurement {
         return wrapper.array();
     }
 
+    // to prevent NullPointerExceptions write zeroes instead
     private byte[] valOrNull(byte[] val) {
         if (val == null) {
             return new byte[]{(byte) 0};

@@ -14,7 +14,6 @@ import java.util.logging.Level;
 public class ConfigManager {
 
     public static Properties getProperties(String propFileName) {
-        String result = "";
         InputStream inputStream;
         Properties prop = new Properties();
 
