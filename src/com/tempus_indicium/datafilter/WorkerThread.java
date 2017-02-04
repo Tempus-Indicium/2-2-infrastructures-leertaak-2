@@ -16,6 +16,7 @@ import java.util.logging.Level;
  * Part of the 2-2-infrastructures-leertaak-2 project.
  */
 public class WorkerThread extends Thread {
+    public static boolean isWriting;
     // Note: this Thread is expected to loop as long as the client keeps streaming data
 
     private Socket clientSocket;
@@ -60,13 +61,8 @@ public class WorkerThread extends Thread {
 
                         m.setVariableFromXMLString(line);
                     }
-                    if (!skipMeasurement && MasterThread.workersCounter == 800) {
-                        try {
-                            App.measurementBytes.put(m.getArrayOfByteVariables());
-                        } catch (BufferOverflowException e) {
-                            FileStore.writeToFile();
-//                            App.measurementBytes.put(m.getArrayOfByteVariables());
-                        }
+                    if (!skipMeasurement && !WorkerThread.isWriting) {
+                        App.measurementsList.add(m.getArrayOfByteVariables());
                     }
                 }
             }

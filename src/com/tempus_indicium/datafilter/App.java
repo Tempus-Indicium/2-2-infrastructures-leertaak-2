@@ -3,12 +3,13 @@ package com.tempus_indicium.datafilter;
 import com.tempus_indicium.datafilter.config.ConfigManager;
 import com.tempus_indicium.datafilter.db.FileStore;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.nio.ByteBuffer;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -23,22 +24,20 @@ public class App {
     public final static int SERVER_PORT = Integer.parseInt(config.getProperty("SERVER_PORT"));
 
     public static HashMap<String, Pattern> xmlPatterns;
-//    public static List<byte[]> measurementRows;
-    public static ByteBuffer measurementBytes;
+    public static List<byte[]> measurementsList;
 
     /**
      * Start of the Tempus Indicium datafilter
      * @param args any arguments
      */
     public static void main(String[] args) {
-        if(!FileStore.initializeFileStore()) {
-            LOGGER.log(Level.SEVERE, "File store could not be initialized.");
-            System.exit(1);
-        }
         try {
-            FileStore.fileOutputStream = new FileOutputStream(FileStore.currentFile, true);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            FileStore.dataGatherSocket = new Socket(config.getProperty("DATAGATHER_HOST"),
+                    Integer.parseInt(config.getProperty("DATAGATHER_PORT")));
+            FileStore.dataOutputStream = new DataOutputStream(FileStore.dataGatherSocket.getOutputStream());
+        } catch (IOException e) {
+            System.out.println("Exception thrown when connecting to the datagather application. Make sure datagather is running.");
+            System.exit(1);
         }
 
         FileStore.loadStationsFile();
@@ -62,8 +61,9 @@ public class App {
 
 //        App.measurementRows = new ArrayList<>();
         // bytes per measurement is 10
-        byte[] bigByteArray = new byte[Integer.parseInt(App.config.getProperty("ROWS_PER_WRITE")) * 10];
-        App.measurementBytes = ByteBuffer.wrap(bigByteArray);
+//        byte[] bigByteArray = new byte[Integer.parseInt(App.config.getProperty("ROWS_PER_WRITE")) * 10];
+//        App.measurementsList = ByteBuffer.wrap(bigByteArray);
+        App.measurementsList = new ArrayList<>();
 
         new MasterThread().start();
     }

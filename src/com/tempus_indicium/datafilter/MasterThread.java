@@ -1,5 +1,7 @@
 package com.tempus_indicium.datafilter;
 
+import com.tempus_indicium.datafilter.db.FileStore;
+
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.LinkedList;
@@ -30,12 +32,22 @@ public class MasterThread extends Thread {
             Socket clientSocket = this.acceptNewClient();
 
             if (clientSocket != null) {
-                workers.add(new WorkerThread(clientSocket));
+                WorkerThread worker = new WorkerThread(clientSocket);
+                workers.add(worker);
                 MasterThread.workersCounter++;
                 App.LOGGER.log(Level.INFO, "Current workers: "+MasterThread.workersCounter);
+                worker.start();
             }
         }
-        workers.forEach(Thread::start);
+//        workers.forEach(Thread::start);
+        while (true) {
+            try {
+                Thread.sleep(100);
+                FileStore.writeToOutputStreamIfNeeded();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private Socket acceptNewClient() {
