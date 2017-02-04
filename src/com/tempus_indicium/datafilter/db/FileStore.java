@@ -1,6 +1,6 @@
-package com.tempus_indicium.app.db;
+package com.tempus_indicium.datafilter.db;
 
-import com.tempus_indicium.app.App;
+import com.tempus_indicium.datafilter.App;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -11,7 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static com.tempus_indicium.app.App.config;
+import static com.tempus_indicium.datafilter.App.config;
 
 /**
  * Created by peterzen on 2017-01-23.

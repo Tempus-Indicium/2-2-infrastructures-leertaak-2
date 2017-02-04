@@ -1,6 +1,6 @@
-package com.tempus_indicium.app.config;
+package com.tempus_indicium.datafilter.config;
 
-import com.tempus_indicium.app.App;
+import com.tempus_indicium.datafilter.App;
 
 import java.io.IOException;
 import java.io.InputStream;

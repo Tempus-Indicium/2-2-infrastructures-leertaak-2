@@ -1,7 +1,7 @@
-package com.tempus_indicium.app;
+package com.tempus_indicium.datafilter;
 
-import com.tempus_indicium.app.db.FileStore;
-import com.tempus_indicium.app.db.Measurement;
+import com.tempus_indicium.datafilter.db.FileStore;
+import com.tempus_indicium.datafilter.db.Measurement;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.nio.BufferOverflowException;
-import java.util.HashSet;
 import java.util.logging.Level;
 
 /**
@@ -31,14 +30,14 @@ public class WorkerThread extends Thread {
         // step 1
         this.openClientInputStream();
 
-//        while (MasterThread.workersCounter < 800) {
-//            try {
-//                Thread.sleep(100);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }
+        while (true) {
+            this.readFromInputStream();
+        }
 
+//        this.closeAndReleaseConnection();
+    }
+
+    private void readFromInputStream() {
         try {
             String line;
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(this.inputStream));
@@ -61,7 +60,7 @@ public class WorkerThread extends Thread {
 
                         m.setVariableFromXMLString(line);
                     }
-                    if (!skipMeasurement && MasterThread.workersCounter == 600) {
+                    if (!skipMeasurement && MasterThread.workersCounter == 800) {
                         try {
                             App.measurementBytes.put(m.getArrayOfByteVariables());
                         } catch (BufferOverflowException e) {
@@ -76,8 +75,6 @@ public class WorkerThread extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        this.closeAndReleaseConnection();
     }
 
     private void openClientInputStream() {

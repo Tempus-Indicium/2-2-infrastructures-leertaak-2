@@ -1,4 +1,4 @@
-package com.tempus_indicium.app;
+package com.tempus_indicium.datafilter;
 
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -26,7 +26,7 @@ public class MasterThread extends Thread {
 
         List<WorkerThread> workers = new LinkedList<>();
 
-        while (MasterThread.workersCounter < 600) {
+        while (MasterThread.workersCounter < 800) {
             Socket clientSocket = this.acceptNewClient();
 
             if (clientSocket != null) {

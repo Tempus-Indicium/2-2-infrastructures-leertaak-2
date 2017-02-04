@@ -1,7 +1,7 @@
-package com.tempus_indicium.app;
+package com.tempus_indicium.datafilter;
 
-import com.tempus_indicium.app.config.ConfigManager;
-import com.tempus_indicium.app.db.FileStore;
+import com.tempus_indicium.datafilter.config.ConfigManager;
+import com.tempus_indicium.datafilter.db.FileStore;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
  * Part of the 2-2-infrastructures-leertaak-2 project.
  */
 public class App {
-    public final static Logger LOGGER = Logger.getLogger("com.tempus_indicium.app");
+    public final static Logger LOGGER = Logger.getLogger("com.tempus_indicium.datafilter");
     public final static Properties config = ConfigManager.getProperties("config.properties");
 
     public final static int SERVER_PORT = Integer.parseInt(config.getProperty("SERVER_PORT"));
@@ -27,7 +27,7 @@ public class App {
     public static ByteBuffer measurementBytes;
 
     /**
-     * Start of the Tempus Indicium app
+     * Start of the Tempus Indicium datafilter
      * @param args any arguments
      */
     public static void main(String[] args) {

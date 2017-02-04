@@ -1,6 +1,6 @@
-package com.tempus_indicium.app.db;
+package com.tempus_indicium.datafilter.db;
 
-import com.tempus_indicium.app.App;
+import com.tempus_indicium.datafilter.App;
 
 import java.nio.ByteBuffer;
 import java.text.DateFormat;
