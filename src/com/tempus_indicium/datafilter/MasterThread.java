@@ -32,22 +32,22 @@ public class MasterThread extends Thread {
             Socket clientSocket = this.acceptNewClient();
 
             if (clientSocket != null) {
-                WorkerThread worker = new WorkerThread(clientSocket);
-                workers.add(worker);
+                workers.add(new WorkerThread(clientSocket));
                 MasterThread.workersCounter++;
                 App.LOGGER.log(Level.INFO, "Current workers: "+MasterThread.workersCounter);
-                worker.start();
             }
         }
-//        workers.forEach(Thread::start);
-        while (true) {
-            try {
-                Thread.sleep(100);
-                FileStore.writeToOutputStreamIfNeeded();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+
+        workers.forEach(Thread::start);
+
+//        while (true) {
+//            try {
+//                Thread.sleep(100);
+//                FileStore.writeToOutputStreamIfNeeded();
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
     }
 
     private Socket acceptNewClient() {

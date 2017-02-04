@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
-import java.nio.BufferOverflowException;
 import java.util.logging.Level;
 
 /**
@@ -16,7 +15,6 @@ import java.util.logging.Level;
  * Part of the 2-2-infrastructures-leertaak-2 project.
  */
 public class WorkerThread extends Thread {
-    public static boolean isWriting;
     // Note: this Thread is expected to loop as long as the client keeps streaming data
 
     private Socket clientSocket;
@@ -32,6 +30,11 @@ public class WorkerThread extends Thread {
         this.openClientInputStream();
 
         while (true) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             this.readFromInputStream();
         }
 
@@ -61,8 +64,9 @@ public class WorkerThread extends Thread {
 
                         m.setVariableFromXMLString(line);
                     }
-                    if (!skipMeasurement && !WorkerThread.isWriting) {
-                        App.measurementsList.add(m.getArrayOfByteVariables());
+                    if (!skipMeasurement && FileStore.listLock.availablePermits() >= 1) {
+                        FileStore.directWriteToOutputStream(m.getArrayOfByteVariables());
+//                        App.measurementsList.add(m.getArrayOfByteVariables());
                     }
                 }
             }
