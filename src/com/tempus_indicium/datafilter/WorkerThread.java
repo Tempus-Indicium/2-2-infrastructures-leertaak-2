@@ -65,7 +65,7 @@ public class WorkerThread extends Thread {
                             App.measurementBytes.put(m.getArrayOfByteVariables());
                         } catch (BufferOverflowException e) {
                             FileStore.writeToFile();
-                            App.measurementBytes.put(m.getArrayOfByteVariables());
+//                            App.measurementBytes.put(m.getArrayOfByteVariables());
                         }
                     }
                 }
