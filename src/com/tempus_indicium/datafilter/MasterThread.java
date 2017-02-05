@@ -2,6 +2,7 @@ package com.tempus_indicium.datafilter;
 
 import com.tempus_indicium.datafilter.db.FileStore;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.LinkedList;
@@ -40,14 +41,14 @@ public class MasterThread extends Thread {
 
         workers.forEach(Thread::start);
 
-//        while (true) {
-//            try {
-//                Thread.sleep(100);
-//                FileStore.writeToOutputStreamIfNeeded();
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }
+        while (true) {
+            try {
+                Thread.sleep(500);
+                FileStore.dataOutputStream.flush();
+            } catch (InterruptedException | IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private Socket acceptNewClient() {

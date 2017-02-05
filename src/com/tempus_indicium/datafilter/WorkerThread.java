@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.net.SocketException;
+import java.nio.file.Path;
 import java.util.logging.Level;
 
 /**
@@ -29,13 +31,17 @@ public class WorkerThread extends Thread {
         // step 1
         this.openClientInputStream();
 
-        while (true) {
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        try {
+            while (this.inputStream.available() > 0) {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                this.readFromInputStream();
             }
-            this.readFromInputStream();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
 //        this.closeAndReleaseConnection();
