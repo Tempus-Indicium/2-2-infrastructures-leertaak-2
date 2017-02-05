@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
-import java.net.SocketException;
-import java.nio.file.Path;
 import java.util.logging.Level;
 
 /**
@@ -72,7 +70,6 @@ public class WorkerThread extends Thread {
                     }
                     if (!skipMeasurement && FileStore.listLock.availablePermits() >= 1) {
                         FileStore.directWriteToOutputStream(m.getArrayOfByteVariables());
-//                        App.measurementsList.add(m.getArrayOfByteVariables());
                     }
                 }
             }

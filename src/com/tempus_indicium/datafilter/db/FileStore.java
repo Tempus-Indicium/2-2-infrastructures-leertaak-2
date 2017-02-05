@@ -53,36 +53,9 @@ public class FileStore {
         }
     }
 
-    public static synchronized void writeToOutputStreamIfNeeded() {
-        if (App.measurementsList.size() >= Integer.parseInt(App.config.getProperty("ROWS_PER_WRITE"))) {
-            try {
-                listLock.acquire();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.out.println("PERFORMING WRITE MEASUREMENTS: "+App.measurementsList.size());
-            App.measurementsList.forEach(m -> {
-                try {
-                    FileStore.dataOutputStream.write(m);
-                } catch (IOException | NullPointerException e) {
-                    System.out.println("Invalid measurement ignored");
-                }
-            });
-            System.out.println("CLEARING LIST");
-            App.measurementsList.clear();
-            listLock.release();
-            try {
-                FileStore.dataOutputStream.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     public static void directWriteToOutputStream(byte[] bytes) {
         try {
             FileStore.dataOutputStream.write(bytes);
-            FileStore.dataOutputStream.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }

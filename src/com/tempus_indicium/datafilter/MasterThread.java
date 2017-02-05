@@ -43,7 +43,7 @@ public class MasterThread extends Thread {
 
         while (true) {
             try {
-                Thread.sleep(500);
+                Thread.sleep(100);
                 FileStore.dataOutputStream.flush();
             } catch (InterruptedException | IOException e) {
                 e.printStackTrace();

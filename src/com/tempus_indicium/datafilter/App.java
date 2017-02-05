@@ -6,9 +6,7 @@ import com.tempus_indicium.datafilter.db.FileStore;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -24,7 +22,6 @@ public class App {
     public final static int SERVER_PORT = Integer.parseInt(config.getProperty("SERVER_PORT"));
 
     public static HashMap<String, Pattern> xmlPatterns;
-    public static List<byte[]> measurementsList;
 
     /**
      * Start of the Tempus Indicium datafilter
@@ -58,12 +55,6 @@ public class App {
 //        xmlPatterns.put("frshtt", Pattern.compile("([0-1]+)"));
 //        xmlPatterns.put("cldc", Pattern.compile("([0-9.]+)"));
 //        xmlPatterns.put("wnddir", Pattern.compile("([0-9]+)"));
-
-//        App.measurementRows = new ArrayList<>();
-        // bytes per measurement is 10
-//        byte[] bigByteArray = new byte[Integer.parseInt(App.config.getProperty("ROWS_PER_WRITE")) * 10];
-//        App.measurementsList = ByteBuffer.wrap(bigByteArray);
-        App.measurementsList = new ArrayList<>();
 
         new MasterThread().start();
     }
