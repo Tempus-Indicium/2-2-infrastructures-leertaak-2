@@ -68,7 +68,7 @@ public class WorkerThread extends Thread {
 
                         m.setVariableFromXMLString(line);
                     }
-                    if (!skipMeasurement && FileStore.listLock.availablePermits() >= 1) {
+                    if (!skipMeasurement) {
                         FileStore.directWriteToOutputStream(m.getArrayOfByteVariables());
                     }
                 }

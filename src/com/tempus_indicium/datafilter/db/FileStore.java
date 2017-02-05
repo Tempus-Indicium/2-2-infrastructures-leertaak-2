@@ -1,15 +1,11 @@
 package com.tempus_indicium.datafilter.db;
 
-import com.tempus_indicium.datafilter.App;
-import com.tempus_indicium.datafilter.WorkerThread;
-
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
-import java.util.concurrent.Semaphore;
 
 import static com.tempus_indicium.datafilter.App.config;
 
@@ -21,7 +17,6 @@ public class FileStore {
     public static HashMap<Integer, String[]> stations;
     public static DataOutputStream dataOutputStream;
     public static Socket dataGatherSocket;
-    public static final Semaphore listLock = new Semaphore(1, true);
 
     // load the stations.csv file in memory so we can match the data for later saving of measurements
     public static void loadStationsFile() {
